@@ -1,0 +1,1 @@
+{"description":{"plain":"Unknown pricing mode must fail closed."},"id":"var_bogus","price":{"amount":100,"currency":"USD"},"pricing":{"mode":"negotiable"},"title":"Bogus Mode Variant"}

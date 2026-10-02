@@ -1,0 +1,144 @@
+{
+  "_comment": "Expected validation outcome per fixture against the BASELINE (b0e81ad) and PROPOSED schemas. kind selects the validator (variant/product).",
+  "vectors": [
+    {
+      "baseline": "valid",
+      "file": "priced_variant_basic.json",
+      "kind": "variant",
+      "note": "minimal priced variant; no regression",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "valid",
+      "file": "priced_variant_full.json",
+      "kind": "variant",
+      "note": "transcribed from docs rest.md Blue Runner Pro search example",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "valid",
+      "file": "priced_variant_free.json",
+      "kind": "variant",
+      "note": "amount:0 keeps its released 'free' meaning",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "valid",
+      "file": "priced_product.json",
+      "kind": "product",
+      "note": "all-priced product keeps price_range required",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "onrequest_variant_quote_required.json",
+      "kind": "variant",
+      "note": "the gap: baseline rejects with 'price' required",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "onrequest_variant_contract_only.json",
+      "kind": "variant",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "onrequest_variant_buyer_specific_noprice.json",
+      "kind": "variant",
+      "note": "anonymous caller sees buyer_specific without price",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "valid",
+      "file": "onrequest_variant_buyer_specific_priced.json",
+      "kind": "variant",
+      "note": "linked buyer: old validators see a normal priced variant (forward-safe)",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "onrequest_product_mixed_norange.json",
+      "kind": "product",
+      "note": "mixed product may omit price_range",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "onrequest_product_all_norange.json",
+      "kind": "product",
+      "note": "all-on-request product omits price_range",
+      "proposed": "valid"
+    },
+    {
+      "baseline": "valid",
+      "file": "conflict_variant_price_and_quote_required.json",
+      "kind": "variant",
+      "note": "old validators cannot see the conflict (pricing ignored); new schema rejects it",
+      "proposed": "invalid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "accidental_priceless_variant.json",
+      "kind": "variant",
+      "note": "explicit-on-request vs accidentally-missing stay distinguishable",
+      "proposed": "invalid"
+    },
+    {
+      "baseline": "valid",
+      "file": "bogus_mode_variant.json",
+      "kind": "variant",
+      "note": "closed enum fails closed on unknown modes",
+      "proposed": "invalid"
+    },
+    {
+      "baseline": "invalid",
+      "file": "onrequest_product_all_with_range.json",
+      "kind": "product",
+      "note": "fabricated range over zero priced variants rejected by both",
+      "proposed": "invalid"
+    },
+    {
+      "file": "onrequest_variant_quote_required_with_list_price.json",
+      "kind": "variant",
+      "baseline": "invalid",
+      "proposed": "valid",
+      "note": "list_price is a legitimate reference on an unpriced variant"
+    },
+    {
+      "file": "onrequest_variant_quote_required_with_unit_price.json",
+      "kind": "variant",
+      "baseline": "invalid",
+      "proposed": "invalid",
+      "note": "unit_price is a per-unit selling price: banned with no-price modes"
+    },
+    {
+      "file": "onrequest_variant_buyer_specific_noprice_with_unit_price.json",
+      "kind": "variant",
+      "baseline": "invalid",
+      "proposed": "invalid",
+      "note": "unit_price requires price to be present"
+    },
+    {
+      "file": "onrequest_variant_buyer_specific_priced_with_unit_price.json",
+      "kind": "variant",
+      "baseline": "valid",
+      "proposed": "valid",
+      "note": "priced buyer_specific variant may carry unit_price"
+    },
+    {
+      "file": "onrequest_product_mixed_list_price_range.json",
+      "kind": "product",
+      "baseline": "invalid",
+      "proposed": "valid",
+      "note": "baseline rejects the priceless variant; proposed permits list_price_range on mixed products"
+    },
+    {
+      "file": "onrequest_product_all_norange_with_list_price_range.json",
+      "kind": "product",
+      "baseline": "invalid",
+      "proposed": "invalid",
+      "note": "baseline rejects priceless variants; proposed rejects the list_price_range"
+    }
+  ]
+}

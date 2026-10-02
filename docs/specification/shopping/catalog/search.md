@@ -61,6 +61,13 @@ merchants MAY support additional custom filters via `additionalProperties`.
 
 {{ schema_fields('types/price_filter', 'shopping/catalog') }}
 
+Variants that do not carry a numeric `price` in the response (see
+[Pricing state](index.md#pricing-state)) are excluded from price-filter
+matching — they have no amount to compare, and a filter **MUST NOT** treat a
+missing price as zero. When a price filter is present, matching applies to
+the priced variants; on-request variants are dropped from filter matching,
+and the Business **MAY** surface them through a message.
+
 ## Pagination
 
 Cursor-based pagination for list operations. Cursors are opaque strings. A

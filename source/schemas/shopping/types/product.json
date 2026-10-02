@@ -8,7 +8,6 @@
     "id",
     "title",
     "description",
-    "price_range",
     "variants"
   ],
   "properties": {
@@ -42,7 +41,7 @@
     },
     "price_range": {
       "$ref": "../../common/types/price_range.json",
-      "description": "Price range across all variants."
+      "description": "Price range across all variants. [PROPOSED: when one or more variants do not carry a numeric `price` in this response (see Variant `pricing`), `price_range` MAY be omitted; when present it MUST be computed over the priced variants only, and the product SHOULD carry a `price_on_request` disclosure warning. When no variant carries a numeric price, `price_range` MUST be omitted. `list_price_range`, when present, follows the same rule.]"
     },
     "list_price_range": {
       "$ref": "../../common/types/price_range.json",
@@ -85,5 +84,44 @@
       "type": "object",
       "description": "Business-defined custom data extending the standard product model."
     }
-  }
+  },
+  "allOf": [
+    {
+      "description": "[PROPOSED] `price_range` is REQUIRED unless at least one variant carries no numeric price in this response.",
+      "if": {
+        "properties": {
+          "variants": {
+            "type": "array",
+            "contains": { "not": { "required": ["price"] } }
+          }
+        }
+      },
+      "then": {},
+      "else": { "required": ["price_range"] }
+    },
+    {
+      "description": "[PROPOSED] `price_range` MUST be omitted when no variant carries a numeric price in this response.",
+      "if": {
+        "properties": {
+          "variants": {
+            "type": "array",
+            "not": { "contains": { "required": ["price"] } }
+          }
+        }
+      },
+      "then": { "not": { "required": ["price_range"] } }
+    },
+    {
+      "description": "[PROPOSED] `list_price_range` MUST be omitted when no variant carries a numeric price in this response.",
+      "if": {
+        "properties": {
+          "variants": {
+            "type": "array",
+            "not": { "contains": { "required": ["price"] } }
+          }
+        }
+      },
+      "then": { "not": { "required": ["list_price_range"] } }
+    }
+  ]
 }

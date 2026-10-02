@@ -7,8 +7,7 @@
   "required": [
     "id",
     "title",
-    "description",
-    "price"
+    "description"
   ],
   "properties": {
     "id": {
@@ -63,7 +62,27 @@
     },
     "price": {
       "$ref": "../../common/types/price.json",
-      "description": "Current selling price. Price is the amount per one whole `quantity_unit.unit` (for example, per lb or per hour); when `quantity_unit` is absent, it is per `each`. Line total is `price × quantity × 10^-scale`, computed and rounded once by the Business; `totals` remain authoritative."
+      "description": "Current selling price. REQUIRED when `pricing` is absent or `pricing.mode` is `public` [PROPOSED: conditional requiredness — see `pricing`]. MUST NOT be present when `pricing.mode` is `quote_required` or `contract_only` [PROPOSED]. Price is the amount per one whole `quantity_unit.unit` (for example, per lb or per hour); when `quantity_unit` is absent, it is per `each`. Line total is `price × quantity × 10^-scale`, computed and rounded once by the Business; `totals` remain authoritative."
+    },
+    "pricing": {
+      "type": "object",
+      "description": "[PROPOSED — requires a TC-approved Enhancement Proposal] Pricing state of this variant in this response. `mode` describes how price is (or is not) advertised to the caller of *this response* — it is a property of the response, not a fixed property of the variant: the same variant may be `buyer_specific` to an anonymous caller and carry a numeric price for a linked buyer. Well-known modes: `public` (default; a numeric price is advertised and `price` is REQUIRED), `buyer_specific` (price depends on the caller; a numeric `price` MAY be present when this response is addressed to a recognized buyer, and MUST be treated as specific to that caller), `quote_required` (no price is advertised; the buyer must request a quote — `price` MUST NOT be present), `contract_only` (no price is advertised; pricing exists only under contract — `price` MUST NOT be present). A Platform MUST NOT display, infer, or compute a numeric price for a variant that does not carry one in the response, and MUST NOT treat a missing price as zero (note: `amount: 0` on a present `price` still means free).",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["public", "buyer_specific", "quote_required", "contract_only"],
+          "description": "Pricing mode for this variant in this response."
+        },
+        "reason": {
+          "type": "string",
+          "description": "Business-defined machine-readable reason for a non-public mode (for example `contract_or_volume_dependent`). Informational only; consumers MUST NOT infer semantics beyond `mode`."
+        },
+        "next_step": {
+          "type": "string",
+          "description": "Well-known values: `request_quote`. What the buyer can do next to obtain a price. Informational only; it defines no quote, RFQ, or identity-linking workflow."
+        }
+      }
     },
     "quantity_unit": {
       "$ref": "../../common/types/quantity_unit.json",
@@ -127,5 +146,57 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "description": "[PROPOSED] Neither `price` nor `unit_price` (a per-unit selling price) may be present when the variant advertises no price in this response.",
+      "if": {
+        "properties": {
+          "pricing": {
+            "type": "object",
+            "properties": {
+              "mode": { "enum": ["quote_required", "contract_only"] }
+            },
+            "required": ["mode"]
+          }
+        },
+        "required": ["pricing"]
+      },
+      "then": {
+        "not": { "anyOf": [{ "required": ["price"] }, { "required": ["unit_price"] }] }
+      }
+    },
+    {
+      "description": "[PROPOSED] Price is REQUIRED for publicly priced variants (the default when `pricing` is absent).",
+      "if": {
+        "anyOf": [
+          { "not": { "required": ["pricing"] } },
+          {
+            "properties": {
+              "pricing": {
+                "type": "object",
+                "properties": {
+                  "mode": { "const": "public" }
+                },
+                "required": ["mode"]
+              }
+            },
+            "required": ["pricing"]
+          }
+        ]
+      },
+      "then": {
+        "required": ["price"]
+      }
+    },
+    {
+      "description": "[PROPOSED] `unit_price` is derived from the selling price and requires `price` to be present.",
+      "if": {
+        "required": ["unit_price"]
+      },
+      "then": {
+        "required": ["price"]
+      }
+    }
+  ]
 }
