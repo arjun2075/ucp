@@ -1,0 +1,116 @@
+FAIL  /tmp/por-verify/docs/specification/shopping/catalog/index.md:287  [schema=shopping/catalog_lookup op=get_product]
+       validation: /product — {"required":["price_range"]} is not allowed for {"id":"prod_industrial_printer","title":"Industrial Printer","description":{"plain":"High-volume printer leased on quoted terms."},"price_range":{"min":{"amount":1000,"currency":"USD"},"max":{"amount":1000,"currency":"USD"}},"variants":[{"id":"var_industrial_printer","title":"Industrial Printer","description":{"plain":"High-volume printer leased on quoted terms."},"pricing":{"mode":"quote_required","next_step":"request_quote"}}]}
+FAIL  /tmp/por-verify/docs/specification/shopping/catalog/mcp.md:408  [schema=shopping/catalog_lookup extract=$.result.structuredContent op=lookup]
+       validation: /products/0 — {"required":["price_range"]} is not allowed for {"id":"prod_abc123","title":"Blue Runner Pro","description":{"plain":"A comfortable everyday running shoe."},"price_range":{"min":{"amount":12000,"currency":"USD"},"max":{"amount":12000,"currency":"USD"}},"variants":[]}
+FAIL  /tmp/por-verify/docs/specification/shopping/catalog/rest.md:309  [schema=shopping/catalog_lookup op=lookup]
+       validation: /products/0 — {"required":["price_range"]} is not allowed for {"id":"prod_abc123","title":"Blue Runner Pro","description":{"plain":"Lightweight running shoes."},"variants":[],"price_range":{"min":{"amount":12000,"currency":"USD"},"max":{"amount":12000,"currency":"USD"}}}
+       validation: /products/1 — {"required":["price_range"]} is not allowed for {"id":"prod_def456","title":"Trail Blazer X","description":{"plain":"Trail shoes with superior traction."},"variants":[],"price_range":{"min":{"amount":15000,"currency":"USD"},"max":{"amount":15000,"currency":"USD"}}}
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:178  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:278  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:294  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:308  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:321  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:342  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:373  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:427  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:464  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:479  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:504  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:538  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:667  [op=read]
+       schema authoring example
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:726  [op=read]
+       example validation guide
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:767  [op=read]
+       example validation guide
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:795  [op=read]
+       example validation guide
+SKIP  /tmp/por-verify/docs/documentation/schema-authoring.md:840  [op=read]
+       example validation guide
+SKIP  /tmp/por-verify/docs/specification/common/identity-linking/index.md:1063  [op=read]
+       OAuth metadata, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/common/identity-linking/index.md:1257  [op=read]
+       OAuth metadata, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/getting-started.md:484  [op=read]
+       package.json snippet
+SKIP  /tmp/por-verify/docs/specification/getting-started.md:549  [op=read]
+       FastAPI/Express response mock
+SKIP  /tmp/por-verify/docs/specification/overview/index.md:347  [op=read]
+       schema definition
+SKIP  /tmp/por-verify/docs/specification/overview/index.md:394  [op=read]
+       schema definition
+SKIP  /tmp/por-verify/docs/specification/overview/index.md:422  [op=read]
+       schema definition
+SKIP  /tmp/por-verify/docs/specification/overview/index.md:941  [op=read]
+       illustrative fragment
+SKIP  /tmp/por-verify/docs/specification/overview/index.md:2915  [op=read]
+       illustrative fragment
+SKIP  /tmp/por-verify/docs/specification/payment/examples/platform-tokenizer-payment-handler.md:274  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/payment/examples/platform-tokenizer-payment-handler.md:470  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/payment/examples/processor-tokenizer-payment-handler.md:237  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/payment/extensions/split-payments.md:111  [op=read]
+       illustrative business profile fragment showing allowed_combinations shape
+SKIP  /tmp/por-verify/docs/specification/payment/extensions/split-payments.md:449  [op=read]
+       illustrative full response combining status, payment, and messages; per-subtree validation shown elsewhere
+SKIP  /tmp/por-verify/docs/specification/payment/extensions/terms.md:266  [op=read]
+       capability declaration fragment
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:405  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:495  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:518  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:541  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:603  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:653  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:707  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/guide.md:735  [op=read]
+       handler schema definition
+SKIP  /tmp/por-verify/docs/specification/payment/template.md:137  [op=read]
+       handler config template
+SKIP  /tmp/por-verify/docs/specification/payment/template.md:212  [op=read]
+       handler config template
+SKIP  /tmp/por-verify/docs/specification/payment/template.md:251  [op=read]
+       handler config template
+SKIP  /tmp/por-verify/docs/specification/payment/template.md:291  [op=read]
+       handler config template
+SKIP  /tmp/por-verify/docs/specification/payment/tokenization.md:163  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/payment/tokenization.md:188  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/payment/tokenization.md:202  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/payment/tokenization.md:219  [op=read]
+       tokenization API, not UCP payload
+SKIP  /tmp/por-verify/docs/specification/permalink.md:307  [op=read]
+       partial field-mapping illustration; no line_items, not a complete shopping request
+SKIP  /tmp/por-verify/docs/specification/permalink.md:344  [op=read]
+       partial field-mapping illustration; no line_items, not a complete shopping request
+SKIP  /tmp/por-verify/docs/specification/shopping/checkout/index.md:650  [op=read]
+       path schema example
+SKIP  /tmp/por-verify/docs/specification/shopping/checkout/index.md:657  [op=read]
+       path schema example
+SKIP  /tmp/por-verify/docs/specification/shopping/checkout/index.md:664  [op=read]
+       path schema example
+
+374 passed, 3 failed, 0 errors, 53 skipped
+VALIDATE EXIT: 1

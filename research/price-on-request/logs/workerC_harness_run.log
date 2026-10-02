@@ -1,0 +1,47 @@
+== price-on-request prototype harness ==
+--- versions ---
+  jsonschema: 4.10.3
+  pydantic: 2.13.5
+  baseline repo: /tmp/porbase @ 
+  proposed repo: /tmp/por-proposed @ 
+  sdk repo: /home/hatch/workspace/ucp-phase1-repos/python-sdk @ 51bf73cec92cfe321a9282b8f49fc8f647068c2e
+  ucp-sdk version: 0.4.6
+--- Legs A-D: fixture matrix (baseline vs proposed) ---
+  [PASS] priced_variant_basic.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] priced_variant_full.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] priced_variant_free.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] priced_product.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] onrequest_variant_quote_required.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] onrequest_variant_contract_only.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] onrequest_variant_buyer_specific_noprice.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] onrequest_variant_buyer_specific_priced.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] onrequest_product_mixed_norange.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] onrequest_product_all_norange.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] conflict_variant_price_and_quote_required.json: baseline=valid (want valid), proposed=invalid (want invalid)
+  [PASS] accidental_priceless_variant.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] bogus_mode_variant.json: baseline=valid (want valid), proposed=invalid (want invalid)
+  [PASS] onrequest_product_all_with_range.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] onrequest_variant_quote_required_with_list_price.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] onrequest_variant_quote_required_with_unit_price.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] onrequest_variant_buyer_specific_noprice_with_unit_price.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] onrequest_variant_buyer_specific_priced_with_unit_price.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] onrequest_product_mixed_list_price_range.json: baseline=invalid (want invalid), proposed=valid (want valid)
+  [PASS] onrequest_product_all_norange_with_list_price_range.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] malformed_pricing_null_with_price.json: baseline=valid (want valid), proposed=invalid (want invalid)
+  [PASS] malformed_pricing_bare_string.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] malformed_pricing_empty_object_with_price.json: baseline=valid (want valid), proposed=invalid (want invalid)
+  [PASS] pricing_public_with_vendor_extension.json: baseline=valid (want valid), proposed=valid (want valid)
+  [PASS] pricing_mode_array_with_price.json: baseline=valid (want valid), proposed=invalid (want invalid)
+  [PASS] unknown_mode_negotiated_with_price.json: baseline=valid (want valid), proposed=invalid (want invalid)
+  [PASS] unit_price_without_price_no_marker.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+  [PASS] pricing_public_without_price.json: baseline=invalid (want invalid), proposed=invalid (want invalid)
+Legs A-D: 28 passed, 0 failed
+--- Leg E: differential fuzz (n=300) ---
+Leg E (differential fuzz, 300 products + 300 variants): 0 mismatches
+--- Leg F: old python SDK ---
+  [PASS] SDK priced payload: accepted (want accepted)
+  [PASS] SDK on-request payload (new): rejected (want rejected)
+  [PASS] SDK priced payload + pricing marker (new client shape): accepted (want accepted)
+Leg F (SDK): passed
+== RESULT: ALL LEGS PASS ==
+exit=0

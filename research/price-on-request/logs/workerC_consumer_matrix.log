@@ -1,0 +1,109 @@
+# Consumer-behavior matrix — price-on-request prototype (Worker C, self-review)
+# jsonschema 4.10.3, pydantic 2.13.5
+# baseline=/tmp/porbase proposed=/tmp/por-proposed sdk=/home/hatch/workspace/ucp-phase1-repos/python-sdk
+
+## (a) old payload acceptance by NEW schemas
+
+| fixture | baseline | proposed | class |
+|---|---|---|---|
+| `priced_variant_basic.json` | valid | valid | no change |
+| `priced_variant_full.json` | valid | valid | no change |
+| `priced_variant_free.json` | valid | valid | no change |
+| `priced_product.json` | valid | valid | no change |
+| `onrequest_variant_buyer_specific_priced.json` | valid | valid | no change |
+| `conflict_variant_price_and_quote_required.json` | valid | invalid | **narrows** |
+| `bogus_mode_variant.json` | valid | invalid | **narrows** |
+| `onrequest_variant_buyer_specific_priced_with_unit_price.json` | valid | valid | no change |
+| `malformed_pricing_null_with_price.json` | valid | invalid | **narrows** |
+| `malformed_pricing_empty_object_with_price.json` | valid | invalid | **narrows** |
+| `pricing_public_with_vendor_extension.json` | valid | valid | no change |
+| `pricing_mode_array_with_price.json` | valid | invalid | **narrows** |
+| `unknown_mode_negotiated_with_price.json` | valid | invalid | **narrows** |
+
+## (b) new payload acceptance by OLD consumers
+
+Validating consumer = baseline jsonschema. Lenient consumer = `variant.get("price", {}).get("amount", 0)`; product fixtures show the first variant's read.
+
+| fixture (proposed-valid) | old validating consumer | old lenient read |
+|---|---|---|
+| `priced_variant_basic.json` | valid | $25.00 |
+| `priced_variant_full.json` | valid | $120.00 |
+| `priced_variant_free.json` | valid | $0.00 |
+| `priced_product.json` | valid | $120.00 |
+| `onrequest_variant_quote_required.json` | invalid (`'price' is a required property`) | $0.00 **<-- $0.00 MISREAD as FREE** |
+| `onrequest_variant_contract_only.json` | invalid (`'price' is a required property`) | $0.00 **<-- $0.00 MISREAD as FREE** |
+| `onrequest_variant_buyer_specific_noprice.json` | invalid (`'price' is a required property`) | $0.00 **<-- $0.00 MISREAD as FREE** |
+| `onrequest_variant_buyer_specific_priced.json` | valid | $499.00 |
+| `onrequest_product_mixed_norange.json` | invalid (`'price_range' is a required property`) | $299.00 |
+| `onrequest_product_all_norange.json` | invalid (`'price_range' is a required property`) | $0.00 **<-- $0.00 MISREAD as FREE** |
+| `onrequest_variant_quote_required_with_list_price.json` | invalid (`'price' is a required property`) | $0.00 **<-- $0.00 MISREAD as FREE** |
+| `onrequest_variant_buyer_specific_priced_with_unit_price.json` | valid | $80.00 |
+| `onrequest_product_mixed_list_price_range.json` | invalid (`'price' is a required property`) | $299.00 |
+| `pricing_public_with_vendor_extension.json` | valid | $25.00 |
+
+## (c) generated SDK behavior (pydantic v2)
+
+OLD side: pinned `ucp-sdk` 0.4.6 models (generated from the RELEASED schemas; `price` required, `pricing` unknown so `extra="allow"` keeps it unvalidated). NEW side: **proposed-schema validation via jsonschema 4.10.3** — regenerating SDK models from the proposed schemas was not feasible in this env (`datamodel_code_generator`/`uv`/`ruff` unavailable), so no NEW-side generated models exist to run.
+
+| fixture | OLD SDK (pydantic) | NEW side (jsonschema on proposed) | note |
+|---|---|---|---|
+| `priced_variant_basic.json` | accepted | valid |  |
+| `priced_variant_full.json` | accepted | valid |  |
+| `priced_variant_free.json` | accepted | valid |  |
+| `priced_product.json` | accepted | valid |  |
+| `onrequest_variant_quote_required.json` | rejected | valid | price: Field required |
+| `onrequest_variant_contract_only.json` | rejected | valid | price: Field required |
+| `onrequest_variant_buyer_specific_noprice.json` | rejected | valid | price: Field required |
+| `onrequest_variant_buyer_specific_priced.json` | accepted | valid |  |
+| `onrequest_product_mixed_norange.json` | rejected | valid | price_range: Field required |
+| `onrequest_product_all_norange.json` | rejected | valid | price_range: Field required |
+| `conflict_variant_price_and_quote_required.json` | accepted | invalid |  |
+| `accidental_priceless_variant.json` | rejected | invalid | price: Field required |
+| `bogus_mode_variant.json` | accepted | invalid |  |
+| `onrequest_product_all_with_range.json` | rejected | invalid | variants.0.price: Field required |
+| `onrequest_variant_quote_required_with_list_price.json` | rejected | valid | price: Field required |
+| `onrequest_variant_quote_required_with_unit_price.json` | rejected | invalid | price: Field required |
+| `onrequest_variant_buyer_specific_noprice_with_unit_price.json` | rejected | invalid | price: Field required |
+| `onrequest_variant_buyer_specific_priced_with_unit_price.json` | accepted | valid |  |
+| `onrequest_product_mixed_list_price_range.json` | rejected | valid | variants.1.price: Field required |
+| `onrequest_product_all_norange_with_list_price_range.json` | rejected | invalid | price_range: Field required |
+| `malformed_pricing_null_with_price.json` | accepted | invalid |  |
+| `malformed_pricing_bare_string.json` | rejected | invalid | price: Field required |
+| `malformed_pricing_empty_object_with_price.json` | accepted | invalid |  |
+| `pricing_public_with_vendor_extension.json` | accepted | valid |  |
+| `pricing_mode_array_with_price.json` | accepted | invalid |  |
+| `unknown_mode_negotiated_with_price.json` | accepted | invalid |  |
+| `unit_price_without_price_no_marker.json` | rejected | invalid | price: Field required |
+| `pricing_public_without_price.json` | rejected | invalid | price: Field required |
+
+## (d) lenient consumer behavior (variant fixtures)
+
+Naive read `variant.get("price", {}).get("amount", 0)` vs strict hand-rolled `variant["price"]["amount"]`.
+
+| fixture | naive amount read | interpretation | strict hand-rolled |
+|---|---|---|---|
+| `priced_variant_basic.json` | $25.00 | correct (price present) | `2500` |
+| `priced_variant_full.json` | $120.00 | correct (price present) | `12000` |
+| `priced_variant_free.json` | $0.00 | correct (price present) | `0` |
+| `onrequest_variant_quote_required.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `onrequest_variant_contract_only.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `onrequest_variant_buyer_specific_noprice.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `onrequest_variant_buyer_specific_priced.json` | $499.00 | correct (price present) | `49900` |
+| `conflict_variant_price_and_quote_required.json` | $999.00 | correct (price present) | `99900` |
+| `accidental_priceless_variant.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `bogus_mode_variant.json` | $1.00 | correct (price present) | `100` |
+| `onrequest_variant_quote_required_with_list_price.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `onrequest_variant_quote_required_with_unit_price.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `onrequest_variant_buyer_specific_noprice_with_unit_price.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `onrequest_variant_buyer_specific_priced_with_unit_price.json` | $80.00 | correct (price present) | `8000` |
+| `malformed_pricing_null_with_price.json` | $25.00 | correct (price present) | `2500` |
+| `malformed_pricing_bare_string.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `malformed_pricing_empty_object_with_price.json` | $25.00 | correct (price present) | `2500` |
+| `pricing_public_with_vendor_extension.json` | $25.00 | correct (price present) | `2500` |
+| `pricing_mode_array_with_price.json` | $25.00 | correct (price present) | `2500` |
+| `unknown_mode_negotiated_with_price.json` | $25.00 | correct (price present) | `2500` |
+| `unit_price_without_price_no_marker.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+| `pricing_public_without_price.json` | $0.00 | **$0.00 misread as FREE** (the #877 harm) | KeyError('price') (fail-loud) |
+
+## RESULT: ALL ASSERTIONS PASS
+exit=0

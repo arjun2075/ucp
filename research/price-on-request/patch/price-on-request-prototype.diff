@@ -1,0 +1,325 @@
+# feat: [PROTOTYPE - DO NOT MERGE] catalog pricing state for price-on-request variants
+#
+# Conventional-commit message for the candidate patch below (header only;
+# nothing was committed). Responds to Universal-Commerce-Protocol/ucp#877.
+#
+# NOTE (corrected 2026-10-02): the `feat:` prefix is PROVISIONAL, not final.
+# Release classification (minor vs major) is an open EP/TC decision pending
+# the project's versioning ruling. The compatibility analysis
+# (COMPATIBILITY.md) shows this is NOT purely additive: baseline-valid
+# payloads carrying a `pricing` field (permitted via additionalProperties)
+# change validity under the proposal -- (a) price + mode
+# quote_required/contract_only goes valid -> invalid (conflict rejection);
+# (b) unknown pricing.mode values go valid -> invalid (closed enum).
+# The 600-case differential fuzz establishes no-regression ONLY for the
+# generated priced subset (no `pricing` field present); it does not imply
+# universal compatibility.
+#
+# PROPOSED - requires a TC-approved Enhancement Proposal before any
+# implementation PR (per org CONTRIBUTING.md). This prototype implies no
+# agreement from maintainers or the Technical Council.
+#
+# Base: Universal-Commerce-Protocol/ucp @ b0e81adecf816a1771b736464f17586d76950f7f
+# Files: 6 changed, 196 insertions(+), 9 deletions(-)
+
+diff --git a/docs/specification/shopping/catalog/index.md b/docs/specification/shopping/catalog/index.md
+index 5ee6167..c29a085 100644
+--- a/docs/specification/shopping/catalog/index.md
++++ b/docs/specification/shopping/catalog/index.md
+@@ -241,6 +241,68 @@ item they present as featured.
+ 
+ {{ schema_fields('types/variant', 'shopping/catalog') }}
+ 
++#### Pricing state
++
++!!! note "Proposed — requires a TC-approved Enhancement Proposal"
++    The pricing-state model in this section is a **prototype** responding to
++    UCP issue #877 ("price on request"). It is not part of the released
++    specification: core schema changes require an Enhancement Proposal and
++    Technical Council approval before implementation.
++
++A variant's `pricing` object states how price is — or is not — advertised
++**in this response**. The mode describes the response, not a fixed property of
++the variant: the same variant may be `buyer_specific` to an anonymous caller
++and carry a numeric price once the caller links their identity (see
++[Identity Linking](../../common/identity-linking/index.md)).
++
++| `pricing.mode` | Meaning | `price` in this response |
++|---|---|---|
++| `public` | A numeric price is advertised (the default when `pricing` is absent). | REQUIRED |
++| `buyer_specific` | Price depends on the caller. | MAY be present when the response is addressed to a recognized buyer; MUST be treated as specific to that caller. Which buyers see which price is Business policy — the schema carries no access-control semantics. |
++| `quote_required` | No price is advertised; the buyer must request a quote. | MUST NOT be present |
++| `contract_only` | No price is advertised; pricing exists only under contract. | MUST NOT be present |
++
++A Platform **MUST NOT** display, infer, or compute a numeric price for a
++variant that does not carry one in the response, and **MUST NOT** treat a
++missing price as zero (a present `price` with `amount: 0` still means free).
++A variant that is explicitly on-request is therefore distinguishable from a
++variant whose price was accidentally omitted: the latter fails validation
++(`price` is required for publicly priced variants). For in-proximity
++"price on request" rendering, Businesses **SHOULD** pair the variant with the
++well-known `price_on_request` warning code using `presentation: "disclosure"`.
++
++Related price fields on unpriced variants: `list_price` (the pre-discount
++reference price) MAY accompany an unpriced variant — for example, a
++strikethrough "List $100" beside a "request quote" disclosure — but it MUST
++NOT be treated as the selling price. `unit_price`, by contrast, is a per-unit
++*selling* price: it MUST NOT be present when the variant carries no `price`
++(schema-enforced), since it would be a conflicting price signal.
++
++How an on-request variant becomes purchasable is outside the catalog: a
++`buyer_specific` price resolves through identity linking, and an accepted
++quote hands into Cart/Checkout through the accepted-commercial-term handoff.
++This section defines no quote, RFQ, expiry, invoice, or payment workflow.
++
++<!-- ucp:example schema=shopping/catalog_lookup op=get_product -->
++```json
++{
++  "ucp": { "version": "{{ ucp_version }}" },
++  "product": {
++    "id": "prod_industrial_printer",
++    "title": "Industrial Printer",
++    "description": { "plain": "High-volume printer leased on quoted terms." },
++    "variants": [
++      {
++        "id": "var_industrial_printer",
++        "title": "Industrial Printer",
++        "description": { "plain": "High-volume printer leased on quoted terms." },
++        "pricing": { "mode": "quote_required", "next_step": "request_quote" }
++      }
++    ]
++  }
++}
++```
++
+ ### Price
+ 
+ {{ schema_fields('types/price', 'shopping/catalog') }}
+@@ -249,6 +311,14 @@ item they present as featured.
+ 
+ {{ schema_fields('types/price_range', 'shopping/catalog') }}
+ 
++When one or more variants do not carry a numeric `price` in the response (see
++[Pricing state](#pricing-state)), `price_range` **MAY** be omitted; when
++present it **MUST** be computed over the priced variants only, and the product
++**SHOULD** carry a `price_on_request` disclosure warning. When no variant
++carries a numeric price, `price_range` **MUST** be omitted. `list_price_range`,
++when present, follows the same rule. Feed records are catalog Products, so
++this rule covers bulk feed records as well.
++
+ ### Media
+ 
+ One logical media item on a Product or Variant — such as an image, a video, or
+diff --git a/docs/specification/shopping/catalog/search.md b/docs/specification/shopping/catalog/search.md
+index 8deb68b..501e5da 100644
+--- a/docs/specification/shopping/catalog/search.md
++++ b/docs/specification/shopping/catalog/search.md
+@@ -61,6 +61,13 @@ merchants MAY support additional custom filters via `additionalProperties`.
+ 
+ {{ schema_fields('types/price_filter', 'shopping/catalog') }}
+ 
++Variants that do not carry a numeric `price` in the response (see
++[Pricing state](index.md#pricing-state)) are excluded from price-filter
++matching — they have no amount to compare, and a filter **MUST NOT** treat a
++missing price as zero. When a price filter is present, matching applies to
++the priced variants; on-request variants are dropped from filter matching,
++and the Business **MAY** surface them through a message.
++
+ ## Pagination
+ 
+ Cursor-based pagination for list operations. Cursors are opaque strings. A
+diff --git a/source/schemas/common/types/price_filter.json b/source/schemas/common/types/price_filter.json
+index eb1fe7b..267a58d 100644
+--- a/source/schemas/common/types/price_filter.json
++++ b/source/schemas/common/types/price_filter.json
+@@ -2,7 +2,7 @@
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+   "$id": "https://ucp.dev/schemas/common/types/price_filter.json",
+   "title": "Price Filter",
+-  "description": "Price range filter denominated in context.currency. When context.currency matches the presentment currency, businesses apply the filter directly. When it differs, businesses SHOULD convert filter values to the presentment currency before applying; if conversion is not supported, businesses MAY ignore the filter and SHOULD indicate this via a message. When context.currency is absent, filter denomination is ambiguous and businesses MAY ignore it.",
++  "description": "Price range filter denominated in context.currency. When context.currency matches the presentment currency, businesses apply the filter directly. When it differs, businesses SHOULD convert filter values to the presentment currency before applying; if conversion is not supported, businesses MAY ignore the filter and SHOULD indicate this via a message. When context.currency is absent, filter denomination is ambiguous and businesses MAY ignore it. [PROPOSED — requires a TC-approved Enhancement Proposal] Variants that do not carry a numeric `price` in the response (see Variant `pricing`) are excluded from price-filter matching; a filter MUST NOT treat a missing price as zero.",
+   "type": "object",
+   "properties": {
+     "min": {
+diff --git a/source/schemas/common/types/warning_code.json b/source/schemas/common/types/warning_code.json
+index abeb263..1ae7c88 100644
+--- a/source/schemas/common/types/warning_code.json
++++ b/source/schemas/common/types/warning_code.json
+@@ -10,6 +10,7 @@
+     "fulfillment_changed",
+     "payment_term_changed",
+     "totals_changed",
+-    "age_restricted"
++    "age_restricted",
++    "price_on_request"
+   ]
+ }
+diff --git a/source/schemas/shopping/types/product.json b/source/schemas/shopping/types/product.json
+index faee177..9a3eaaa 100644
+--- a/source/schemas/shopping/types/product.json
++++ b/source/schemas/shopping/types/product.json
+@@ -8,7 +8,6 @@
+     "id",
+     "title",
+     "description",
+-    "price_range",
+     "variants"
+   ],
+   "properties": {
+@@ -42,7 +41,7 @@
+     },
+     "price_range": {
+       "$ref": "../../common/types/price_range.json",
+-      "description": "Price range across all variants."
++      "description": "Price range across all variants. [PROPOSED: when one or more variants do not carry a numeric `price` in this response (see Variant `pricing`), `price_range` MAY be omitted; when present it MUST be computed over the priced variants only, and the product SHOULD carry a `price_on_request` disclosure warning. When no variant carries a numeric price, `price_range` MUST be omitted. `list_price_range`, when present, follows the same rule.]"
+     },
+     "list_price_range": {
+       "$ref": "../../common/types/price_range.json",
+@@ -85,5 +84,44 @@
+       "type": "object",
+       "description": "Business-defined custom data extending the standard product model."
+     }
+-  }
++  },
++  "allOf": [
++    {
++      "description": "[PROPOSED] `price_range` is REQUIRED unless at least one variant carries no numeric price in this response.",
++      "if": {
++        "properties": {
++          "variants": {
++            "type": "array",
++            "contains": { "not": { "required": ["price"] } }
++          }
++        }
++      },
++      "then": {},
++      "else": { "required": ["price_range"] }
++    },
++    {
++      "description": "[PROPOSED] `price_range` MUST be omitted when no variant carries a numeric price in this response.",
++      "if": {
++        "properties": {
++          "variants": {
++            "type": "array",
++            "not": { "contains": { "required": ["price"] } }
++          }
++        }
++      },
++      "then": { "not": { "required": ["price_range"] } }
++    },
++    {
++      "description": "[PROPOSED] `list_price_range` MUST be omitted when no variant carries a numeric price in this response.",
++      "if": {
++        "properties": {
++          "variants": {
++            "type": "array",
++            "not": { "contains": { "required": ["price"] } }
++          }
++        }
++      },
++      "then": { "not": { "required": ["list_price_range"] } }
++    }
++  ]
+ }
+diff --git a/source/schemas/shopping/types/variant.json b/source/schemas/shopping/types/variant.json
+index 1654704..1373017 100644
+--- a/source/schemas/shopping/types/variant.json
++++ b/source/schemas/shopping/types/variant.json
+@@ -7,8 +7,7 @@
+   "required": [
+     "id",
+     "title",
+-    "description",
+-    "price"
++    "description"
+   ],
+   "properties": {
+     "id": {
+@@ -63,7 +62,27 @@
+     },
+     "price": {
+       "$ref": "../../common/types/price.json",
+-      "description": "Current selling price. Price is the amount per one whole `quantity_unit.unit` (for example, per lb or per hour); when `quantity_unit` is absent, it is per `each`. Line total is `price × quantity × 10^-scale`, computed and rounded once by the Business; `totals` remain authoritative."
++      "description": "Current selling price. REQUIRED when `pricing` is absent or `pricing.mode` is `public` [PROPOSED: conditional requiredness — see `pricing`]. MUST NOT be present when `pricing.mode` is `quote_required` or `contract_only` [PROPOSED]. Price is the amount per one whole `quantity_unit.unit` (for example, per lb or per hour); when `quantity_unit` is absent, it is per `each`. Line total is `price × quantity × 10^-scale`, computed and rounded once by the Business; `totals` remain authoritative."
++    },
++    "pricing": {
++      "type": "object",
++      "description": "[PROPOSED — requires a TC-approved Enhancement Proposal] Pricing state of this variant in this response. `mode` describes how price is (or is not) advertised to the caller of *this response* — it is a property of the response, not a fixed property of the variant: the same variant may be `buyer_specific` to an anonymous caller and carry a numeric price for a linked buyer. Well-known modes: `public` (default; a numeric price is advertised and `price` is REQUIRED), `buyer_specific` (price depends on the caller; a numeric `price` MAY be present when this response is addressed to a recognized buyer, and MUST be treated as specific to that caller), `quote_required` (no price is advertised; the buyer must request a quote — `price` MUST NOT be present), `contract_only` (no price is advertised; pricing exists only under contract — `price` MUST NOT be present). A Platform MUST NOT display, infer, or compute a numeric price for a variant that does not carry one in the response, and MUST NOT treat a missing price as zero (note: `amount: 0` on a present `price` still means free).",
++      "required": ["mode"],
++      "properties": {
++        "mode": {
++          "type": "string",
++          "enum": ["public", "buyer_specific", "quote_required", "contract_only"],
++          "description": "Pricing mode for this variant in this response."
++        },
++        "reason": {
++          "type": "string",
++          "description": "Business-defined machine-readable reason for a non-public mode (for example `contract_or_volume_dependent`). Informational only; consumers MUST NOT infer semantics beyond `mode`."
++        },
++        "next_step": {
++          "type": "string",
++          "description": "Well-known values: `request_quote`. What the buyer can do next to obtain a price. Informational only; it defines no quote, RFQ, or identity-linking workflow."
++        }
++      }
+     },
+     "quantity_unit": {
+       "$ref": "../../common/types/quantity_unit.json",
+@@ -127,5 +146,57 @@
+         }
+       }
+     }
+-  }
++  },
++  "allOf": [
++    {
++      "description": "[PROPOSED] Neither `price` nor `unit_price` (a per-unit selling price) may be present when the variant advertises no price in this response.",
++      "if": {
++        "properties": {
++          "pricing": {
++            "type": "object",
++            "properties": {
++              "mode": { "enum": ["quote_required", "contract_only"] }
++            },
++            "required": ["mode"]
++          }
++        },
++        "required": ["pricing"]
++      },
++      "then": {
++        "not": { "anyOf": [{ "required": ["price"] }, { "required": ["unit_price"] }] }
++      }
++    },
++    {
++      "description": "[PROPOSED] Price is REQUIRED for publicly priced variants (the default when `pricing` is absent).",
++      "if": {
++        "anyOf": [
++          { "not": { "required": ["pricing"] } },
++          {
++            "properties": {
++              "pricing": {
++                "type": "object",
++                "properties": {
++                  "mode": { "const": "public" }
++                },
++                "required": ["mode"]
++              }
++            },
++            "required": ["pricing"]
++          }
++        ]
++      },
++      "then": {
++        "required": ["price"]
++      }
++    },
++    {
++      "description": "[PROPOSED] `unit_price` is derived from the selling price and requires `price` to be present.",
++      "if": {
++        "required": ["unit_price"]
++      },
++      "then": {
++        "required": ["price"]
++      }
++    }
++  ]
+ }

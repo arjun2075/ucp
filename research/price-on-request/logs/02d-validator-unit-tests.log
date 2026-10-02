@@ -1,0 +1,7 @@
+  PASS  process_extract_then_target_ok
+  PASS  process_extract_missing_path_errors
+  PASS  process_target_ellipsis_paths_prefixed
+  PASS  process_empty_body_ok
+
+59 passed, 0 failed
+UNIT TEST EXIT: 0

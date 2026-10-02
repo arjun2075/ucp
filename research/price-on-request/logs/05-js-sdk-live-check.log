@@ -1,0 +1,5 @@
+[PASS] priced_variant_basic.json: got=accept want=accept
+[PASS] onrequest_variant_quote_required.json: got=reject want=reject errors=[{"path":["price"],"message":"Required"}]
+[PASS] onrequest_variant_buyer_specific_priced.json: got=accept want=accept
+== LIVE JS SDK CHECK: ALL PASS ==
+EXIT: 0

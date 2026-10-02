@@ -43,7 +43,12 @@ Exit code `0` iff every non-skipped leg passes.
 ## Legs
 
 - **A–D — fixture matrix** (`vectors.json` + `fixtures/`): each fixture has a
-  declared expected outcome against the baseline and the proposed schema.
+  declared expected outcome against the baseline and the proposed schema
+  (28 vectors as of 2026-10-02: the original 20 plus 8 Worker-C
+  malformed/colliding/unknown-mode vectors — `pricing: null`, bare-string
+  `pricing`, empty `pricing: {}`, non-object mode carrier, a second
+  unknown-mode string, vendor extension inside `pricing`, `unit_price`
+  without `price` and no marker, `public` without price).
   - A: existing priced payloads vs baseline → valid
   - B: existing priced payloads vs proposed → valid (no regression)
   - C: new on-request payloads vs baseline → invalid (proves the gap)
@@ -53,10 +58,41 @@ Exit code `0` iff every non-skipped leg passes.
 - **E — differential fuzz**: N seeded random priced variants and N products
   (all-priced variants + `price_range`); every instance must validate
   identically (valid) under both schemas. Any mismatch is a regression.
+  Scoped: the fuzz generates priced payloads with no `pricing` field and no
+  edge shapes — it does **not** imply universal compatibility (the fixture
+  matrix shows narrowing classes).
 - **F — old python SDK** (`ucp-sdk` 0.4.6 @ 51bf73c, pydantic models):
   priced payload → accepted; new on-request payload → rejected with
   `price: Field required` (fail-closed); priced payload carrying the new
   `pricing` marker → accepted (`extra="allow"`).
+
+## Consumer-behavior matrix (`consumer_matrix.py`)
+
+Four separated sections, all from real validators:
+
+  (a) old payload acceptance by NEW schemas (13 baseline-valid fixtures →
+      proposed verdict, no-change vs narrows);
+  (b) new payload acceptance by OLD consumers — validating (baseline
+      jsonschema) vs lenient (`.get("price", {}).get("amount", 0)`, with the
+      $0.00 misread demonstrated concretely);
+  (c) generated SDK behavior (pydantic v2): OLD side = pinned python-sdk
+      models accept/reject; NEW side = proposed-schema validation via
+      jsonschema, clearly labeled (regenerating SDK models from the proposed
+      schemas was not feasible here: `datamodel_code_generator`/`uv`/`ruff`
+      unavailable);
+  (d) lenient consumer behavior per variant fixture (naive amount read vs
+      strict hand-rolled `["price"]["amount"]`).
+
+```bash
+/tmp/porvenv/bin/python harness/consumer_matrix.py \
+  --baseline /tmp/porbase --proposed /tmp/por-proposed [--quiet]
+```
+
+Exit code 0 iff the scripted assertions hold. Baseline/proposed defaults:
+the baseline default is the read-only `~/workspace/ucp-phase1-repos/ucp`
+clone (read, never modified); the proposed default is the disposable
+`/tmp/por-proposed` copy with the candidate patch applied. Results are
+published in `../COMPATIBILITY.md` §5 (log: `../logs/workerC_consumer_matrix.log`).
 
 ## Notes / limitations
 

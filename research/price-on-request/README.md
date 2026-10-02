@@ -11,7 +11,7 @@ classification and cache isolation remain design decisions for the EP process.
 Base: `b0e81adecf816a1771b736464f17586d76950f7f`.
 The six schema/spec modifications are in their normal repository paths.
 [Design](DESIGN.md), [compatibility](COMPATIBILITY.md), [source map](SOURCE_MAP.md)
-and [unsent EP draft](ENHANCEMENT_PROPOSAL_DRAFT.md) describe the candidate.
+and [unsent submission-ready EP draft](EP_SUBMISSION_DRAFT.md) describe the candidate.
 
 ## Run the schema checks
 
@@ -25,7 +25,7 @@ git worktree add --detach /tmp/ucp-por-baseline b0e81adecf816a1771b736464f17586d
   --baseline /tmp/ucp-por-baseline --proposed "$PWD" --skip-sdk --fuzz 300
 ```
 
-The schema harness contains 20 fixture vectors plus 300 generated priced variants
+The schema harness contains 28 fixture vectors plus 300 generated priced variants
 and 300 generated priced products. Generated cases cover that subset only;
 they do not prove universal compatibility. The candidate rejects some payloads
 accepted by the baseline, including conflicting or unknown `pricing` values.
@@ -40,7 +40,28 @@ self-reviewed; no maintainer or TC endorsement is claimed.
 ## Publication verification
 
 On 2026-10-02 the schema-only harness was rerun against pinned upstream schema
-files and the applied patch: 20/20 fixtures passed, and 300 generated variants
+files and the applied patch: 28/28 fixtures passed, and 300 generated variants
 plus 300 generated products had zero mismatches (exit 0). SDK checks were skipped.
 See [raw output](logs/publication-schema-check.log). This was another agent check,
 not independent human validation.
+
+## Follow-through evidence (2026-10-02)
+
+The schema/spec candidate is unchanged from `6fee350`. This follow-up publishes
+8 additional fixtures, the expanded compatibility matrix, formal EP filing draft,
+and [verification results](VERIFICATION_RESULTS.md) with the canonical raw logs.
+Schema lint and strict docs build passed in the research agent's environment;
+live JS SDK validation passed 3/3. Example validation ran but failed: baseline
+376 passed/0 failed; patched 374 passed/3 failed. All three failures are caused
+by the candidate/scaffold interaction. SDK generation remains blocked, and logs
+also show conditional rules being skipped. No new generated-model enforcement
+is claimed. The EP is **unfiled** and no upstream implementation PR is open.
+
+The published log subset contains the successful checks and canonical failures.
+Superseded environment failures and installation logs remain in the Drive
+handoff. Paths in historical logs identify the research agent's workspace.
+Those historical runs were not independently rerun by the publishing agent;
+only the expanded schema harness was rerun for this publication.
+
+Expanded publication rerun: 28/28 fixtures, 300 variants + 300 products with zero
+mismatches, exit 0; SDK skipped. See [raw output](logs/publication-followthrough-schema-check.log).

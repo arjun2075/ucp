@@ -139,6 +139,62 @@
       "baseline": "invalid",
       "proposed": "invalid",
       "note": "baseline rejects priceless variants; proposed rejects the list_price_range"
+    },
+    {
+      "file": "malformed_pricing_null_with_price.json",
+      "kind": "variant",
+      "baseline": "valid",
+      "proposed": "invalid",
+      "note": "Worker-C: pricing:null is an open extra under baseline; proposed requires an object — narrows"
+    },
+    {
+      "file": "malformed_pricing_bare_string.json",
+      "kind": "variant",
+      "baseline": "invalid",
+      "proposed": "invalid",
+      "note": "Worker-C: the bare-string shorthand sketched in #877 is rejected by both (baseline: price required; proposed: pricing must be an object)"
+    },
+    {
+      "file": "malformed_pricing_empty_object_with_price.json",
+      "kind": "variant",
+      "baseline": "valid",
+      "proposed": "invalid",
+      "note": "Worker-C: pricing:{} is an open extra under baseline; proposed requires mode — narrows"
+    },
+    {
+      "file": "pricing_public_with_vendor_extension.json",
+      "kind": "variant",
+      "baseline": "valid",
+      "proposed": "valid",
+      "note": "Worker-C: unknown fields inside pricing stay open under proposed (only mode is a closed enum)"
+    },
+    {
+      "file": "pricing_mode_array_with_price.json",
+      "kind": "variant",
+      "baseline": "valid",
+      "proposed": "invalid",
+      "note": "Worker-C: a mode is present but pricing is not an object; baseline ignores it, proposed rejects the shape — narrows"
+    },
+    {
+      "file": "unknown_mode_negotiated_with_price.json",
+      "kind": "variant",
+      "baseline": "valid",
+      "proposed": "invalid",
+      "note": "Worker-C: second unknown-mode string ('negotiated'); closed enum fails closed — narrows"
+    },
+    {
+      "file": "unit_price_without_price_no_marker.json",
+      "kind": "variant",
+      "baseline": "invalid",
+      "proposed": "invalid",
+      "note": "Worker-C: unit_price requires price under both (proposed keeps the cross-cutting rule even with no marker)"
+    },
+    {
+      "file": "pricing_public_without_price.json",
+      "kind": "variant",
+      "baseline": "invalid",
+      "proposed": "invalid",
+      "note": "Worker-C: mode public keeps the released price-requiredness (baseline: top-level required; proposed: conditional rule)"
     }
   ]
 }

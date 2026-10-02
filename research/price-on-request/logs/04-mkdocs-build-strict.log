@@ -1,0 +1,44 @@
+
+[31m │  ⚠  Warning from the Material for MkDocs team[0m
+[31m │[0m
+[31m │[0m  MkDocs 2.0, the underlying framework of Material for MkDocs,
+[31m │[0m  will introduce backward-incompatible changes, including:
+[31m │[0m
+[31m │  × [0mAll plugins will stop working – the plugin system has been removed
+[31m │  × [0mAll theme overrides will break – the theming system has been rewritten
+[31m │  × [0mNo migration path exists – existing projects cannot be upgraded
+[31m │  × [0mClosed contribution model – community members can't report bugs
+[31m │  × [0mCurrently unlicensed – unsuitable for production use
+[31m │[0m
+[31m │[0m  Our full analysis:
+[31m │[0m
+[31m │[0m  [4mhttps://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/[0m
+[0m
+INFO    -  [macros] - Found local Python module 'main' in: /tmp/por-verify
+INFO    -  [macros] - Found external Python module 'main' in: /tmp/por-verify
+INFO    -  [macros] - Functions found: define_env,on_pre_page_macros,on_post_page_macros,on_post_build
+INFO    -  [macros] - Config variables: ['extra', 'config', 'environment', 'plugin', 'git', 'ucp_version', 'ucp_url', 'analytics', 'consent', 'scope', 'version', 'macros', 'filters', 'filters_builtin']
+INFO    -  [macros] - Config macros: ['context', 'macros_info', 'now', 'fix_url', 'schema_fields', 'extension_schema_fields', 'auto_generate_schema_reference', 'extension_fields', 'method_fields', 'header_fields']
+INFO    -  [macros] - Config filters: ['pretty', 'relative_url']
+INFO    -  Cleaning site directory
+INFO    -  Building documentation to directory: /tmp/por-verify/site
+INFO    -  An absolute path to '/latest/specification/overview/' is included in the 'nav' configuration, which presumably points to an external resource.
+INFO    -  Doc file 'versioning.md' contains an absolute link '/latest/specification/overview/#component-versioning-and-release-snapshots', it was left as is.
+INFO    -  Doc file 'versioning.md' contains an absolute link '/latest/specification/overview/#protocol-version', it was left as is.
+INFO    -  Doc file 'versioning.md' contains an absolute link '/latest/specification/overview/#component-versioning-and-release-snapshots', it was left as is.
+INFO    -  Doc file 'documentation/core-concepts.md' contains an absolute link '/latest/specification/reference/', it was left as is.
+INFO    -  Doc file 'documentation/core-concepts.md' contains an absolute link '/latest/specification/overview/', it was left as is.
+INFO    -  Doc file 'documentation/core-concepts.md' contains an absolute link '/latest/specification/overview/', it was left as is.
+INFO    -  Doc file 'documentation/core-concepts.md' contains an absolute link '/latest/specification/overview/#authority-binding', it was left as is.
+INFO    -  Doc file 'documentation/core-concepts.md' contains an absolute link '/latest/specification/overview/#protocol-version', it was left as is.
+INFO    -  Doc file 'documentation/core-concepts.md' contains an absolute link '/latest/specification/overview/#component-versioning-and-release-snapshots', it was left as is.
+INFO    -  Doc file 'documentation/schema-authoring.md' contains an absolute link '/latest/specification/overview/#component-versioning-and-release-snapshots', it was left as is.
+INFO    -  Doc file 'documentation/schema-authoring.md' contains an absolute link '/latest/specification/payment/guide/', it was left as is.
+INFO    -  Doc file 'documentation/schema-authoring.md' contains an absolute link '/latest/specification/overview/#the-ucp-protocol-namespace', it was left as is.
+INFO    -  Doc file 'documentation/schema-authoring.md' contains an absolute link '/latest/specification/overview/#protocol-version', it was left as is.
+INFO    -  Doc file 'documentation/schema-authoring.md' contains an absolute link '/latest/specification/overview/#request-constraints', it was left as is.
+INFO    -  Doc file 'documentation/schema-authoring.md' contains an absolute link '/latest/specification/overview/#actions', it was left as is.
+INFO    -  Doc file 'documentation/ucp-and-ap2.md' contains an absolute link '/latest/specification/ap2-mandates/', it was left as is.
+INFO    -  Non-date version 'draft': schema version set to '2026-10-02'
+INFO    -  Documentation built in 65.82 seconds
+MKDOCS EXIT: 0

@@ -1,0 +1,180 @@
+No version specified, cloning main branch...
+Preprocessing schemas...
+Using CPython 3.12.3 interpreter at: /usr/bin/python3
+Creating virtual environment at: .venv
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 32 packages in 1.26s
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/order_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/order_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/checkout_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/checkout_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/checkout_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/cart_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/cart_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/booking_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/booking_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/booking_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/shipping_destination_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/shipping_destination_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/location_destination_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/location_destination_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/line_item_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/line_item_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/item_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/item_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_option_base_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_option_base_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_option_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_option_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_method_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_method_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_group_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_group_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_destination_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_destination_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_available_method_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_available_method_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/stay_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/stay_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/stay_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/rate_plan_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/rate_plan_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/rate_plan_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/property_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/property_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/accommodation_type_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/accommodation_type_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/accommodation_type_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/total_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/total_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/total_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/time_interval_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/time_interval_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/location_summary_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/location_summary_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/location_serves_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/location_serves_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/location_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/location_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/exception_hour_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/exception_hour_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/daily_hour_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/daily_hour_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/ucp_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/ucp_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/order_line_item_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/order_line_item_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_event_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/fulfillment_event_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/expectation_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/expectation_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/adjustment_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/adjustment_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/totals_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/totals_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/totals_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/signals_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/signals_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/signals_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/attribution_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/attribution_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/attribution_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/buyer_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/shopping/types/buyer_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/context_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/context_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/booker_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/booker_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/guest_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/guest_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/postal_address_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/postal_address_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/postal_address_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/quantity_unit_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/quantity_unit_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/measure_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/measure_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/occupancy_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/occupancy_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/occupancy_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/guest_assignment_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/guest_assignment_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/lodging/types/guest_assignment_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/date_interval_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/date_interval_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/date_interval_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/signed_amount_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/signed_amount_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/signed_amount_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/unit_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/unit_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_instrument_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_instrument_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_instrument_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_info_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_info_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_warning_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_warning_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_error_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/message_error_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/geo_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/geo_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/locality_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/locality_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/reverse_domain_name_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/reverse_domain_name_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_credential_complete_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_credential_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/payment_credential_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/warning_code_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/warning_code_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/info_code_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/info_code_update_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/error_code_create_request.json
+Generated variant: /tmp/por-sdk/ucp/source/schemas/common/types/error_code_update_request.json
+Generating Pydantic models from preprocessed schemas...
+Error at schema path 'common/types/constraint_expression.json#': ValidationError: 2 validation errors for JsonSchemaObject
+properties.anyOf.JsonSchemaObject
+  Input should be a valid dictionary or instance of JsonSchemaObject [type=model_type, input_value=['type', 'description', 'minItems', 'items'], input_type=list]
+    For further information visit https://errors.pydantic.dev/2.13/v/model_type
+properties.anyOf.bool
+  Input should be a valid boolean [type=bool_type, input_value=['type', 'description', 'minItems', 'items'], input_type=list]
+    For further information visit https://errors.pydantic.dev/2.13/v/bool_type
+Post-processing generated models (constraints the generator ignores)...
+  ! 'Description' has no generated class; constraint not enforced
+  ! 'Signals' has no generated class; constraint not enforced
+  ! 'Totals' has no generated alias; constraint not enforced
+  ! ucp/source/schemas/common/types/location.json: unsupported conditional required rule; skipped
+  ! ucp/source/schemas/common/types/location_create_request.json: unsupported conditional required rule; skipped
+  ! ucp/source/schemas/common/types/location_update_request.json: unsupported conditional required rule; skipped
+  ! ucp/source/schemas/common/types/unit.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/common/types/unit_create_request.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/common/types/unit_update_request.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/profile.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/profile.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/profile.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/shopping/types/fulfillment_method.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/shopping/types/fulfillment_method.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/shopping/types/fulfillment_method_create_request.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/shopping/types/fulfillment_method_create_request.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/shopping/types/fulfillment_method_update_request.json: unsupported conditional bounds rule; skipped
+  ! ucp/source/schemas/shopping/types/fulfillment_method_update_request.json: unsupported conditional bounds rule; skipped
+  ! 'ConstraintExpression' has no generated class; constraint not enforced
+  minProperties=1 on 'Description' -> NO GENERATED CLASS FOUND
+  propertyNames '^[a-z](?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9](?:[a-z0-9_-]*[a-z0-9_])?)+$' on 'Signals' -> NO GENERATED CLASS FOUND
+  contains [type=='subtotal'; type=='total'] on 'Totals' -> NO GENERATED ALIAS FOUND
+  conditional required on 'Response' -> NO GENERATED CLASS FOUND
+  conditional bounds on 'Total' -> NO GENERATED CLASS FOUND
+  uniqueItems fields ['ConstraintExpression.required', 'Context.eligibility', 'ContextCreateRequest.eligibility', 'ContextUpdateRequest.eligibility', 'LocationFilter.items', 'RequestConstraints.required', 'ValueConstraint.enum'] -> 0 module(s) patched (none)
+  extra=forbid on 'ConstraintExpression' -> NO GENERATED CLASS FOUND
+postprocess: 0 module(s) patched
+GENERATION EXIT: 1

@@ -1,0 +1,10 @@
+E1 empty variants + price_range (pre-existing doc shape): INVALID (2 errors)
+    - [] is too short
+    - {'id': 'p', 'title': 't', 'description': {'plain': 'd'}, 'variants': [], 'price_range': {'min': {'amount': 12000, 'currency': 'USD'}, 'max': {'amount': 12000, 'currency': 'USD'}}} should not be valid 
+E2 empty variants, no price_range: INVALID (2 errors)
+    - [] is too short
+    - 'price_range' is a required property
+E3 all-unpriced variants + price_range (patch example post-scaffold-merge): INVALID (1 errors)
+    - {'id': 'p', 'title': 't', 'description': {'plain': 'd'}, 'variants': [{'id': 'v', 'title': 't', 'description': {'plain': 'd'}, 'pricing': {'mode': 'quote_required'}}], 'price_range': {'min': {'amount'
+E4 all-unpriced variants, no price_range (intended shape): VALID (0 errors)
+E5 all-priced variants + price_range (normal shape): VALID (0 errors)
