@@ -290,12 +290,22 @@ This section defines no quote, RFQ, expiry, invoice, or payment workflow.
   "product": {
     "id": "prod_industrial_printer",
     "title": "Industrial Printer",
-    "description": { "plain": "High-volume printer leased on quoted terms." },
+    "description": { "plain": "High-volume printer, available in standard and custom-enterprise configurations." },
+    "price_range": {
+      "min": { "amount": 1000000, "currency": "USD" },
+      "max": { "amount": 1000000, "currency": "USD" }
+    },
     "variants": [
       {
-        "id": "var_industrial_printer",
-        "title": "Industrial Printer",
-        "description": { "plain": "High-volume printer leased on quoted terms." },
+        "id": "var_industrial_printer_standard",
+        "title": "Standard configuration",
+        "description": { "plain": "Stocked configuration with a published price." },
+        "price": { "amount": 1000000, "currency": "USD" }
+      },
+      {
+        "id": "var_industrial_printer_custom",
+        "title": "Custom enterprise configuration",
+        "description": { "plain": "Built-to-order configuration priced on quoted terms." },
         "pricing": { "mode": "quote_required", "next_step": "request_quote" }
       }
     ]

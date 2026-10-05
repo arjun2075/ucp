@@ -11,6 +11,11 @@ Runs every leg of the compatibility matrix with real validators:
          -> verdicts must agree (proposed changes nothing for priced payloads)
   Leg F  old python SDK (ucp-sdk pinned version)      -> priced accepted,
          on-request rejected fail-closed ('price' Field required)
+  Leg G  pricing-mode fuzz (added 2026-10-05): pricing absent, every known
+         mode, and several future-looking unknown mode strings, crossed with
+         price absent/present (including mixed-mode products) -> PROPOSED
+         schema verdict must match the documented allOf rule for that mode,
+         and an unrecognized mode must never by itself cause rejection
 
 Runnable from any cwd; schema roots and the SDK checkout are configurable:
 
@@ -167,6 +172,134 @@ def leg_fuzz(n, base_store, prop_store):
     return mismatches == 0
 
 
+KNOWN_MODES = ["public", "buyer_specific", "quote_required", "contract_only"]
+UNKNOWN_MODES = [
+    "negotiated_tier",
+    "auction_pending",
+    "dynamic_offer",
+    "partner_price_v2",
+]
+# pricing absent is modeled as mode=None below.
+ALL_MODE_CHOICES = [None] + KNOWN_MODES + UNKNOWN_MODES
+
+
+def random_priced_base(rng):
+    amount = rng.choice([0, 1, 99, 2500, 12000, 10**9])
+    currency = rng.choice(["USD", "EUR", "JPY"])
+    v = {
+        "id": f"var_{rng.randint(1, 10**9)}",
+        "title": rng.choice(["Tee", "Mug", "Lamp", "Chair"]),
+        "description": {"plain": "fuzz"},
+    }
+    return v, amount, currency
+
+
+def apply_mode_and_price(v, amount, currency, mode, with_price):
+    """Build a variant carrying `mode` (or no pricing object if mode is None)
+    crossed with price absent/present, per feedback point 11's coverage ask."""
+    v = dict(v)
+    if mode is not None:
+        v["pricing"] = {"mode": mode}
+    if with_price:
+        v["price"] = {"amount": amount, "currency": currency}
+    return v
+
+
+def expected_proposed_valid(mode, with_price):
+    """What the PROPOSED schema should say for a given (mode, with_price)
+    combination, per the allOf rules verified in variant.json (REVERSED
+    2026-10-05: contract_only moved back into the 'forbid price' rule
+    alongside quote_required):
+      - mode is None (pricing absent) or 'public' -> price REQUIRED
+      - mode in {'quote_required', 'contract_only'} -> price MUST NOT be present
+      - mode == 'buyer_specific' or unknown -> price MAY be absent or present
+        (unconstrained)
+    """
+    if mode is None or mode == "public":
+        return with_price
+    if mode in ("quote_required", "contract_only"):
+        return not with_price
+    return True  # buyer_specific, or any unknown mode
+
+
+def leg_mode_fuzz(n, prop_store):
+    """Leg G (added 2026-10-05, feedback point 11): crosses pricing-mode
+    values (pricing absent, every known mode, and several future-looking
+    unknown modes) with price absent/present, including mixed-mode products,
+    and asserts the PROPOSED schema's verdict matches the documented allOf
+    behavior -- in particular that unknown modes never fail validation merely
+    for being unrecognized. This is a distinct invariant from Leg E (which
+    checks baseline/proposed agreement on the generated all-priced,
+    no-`pricing` subset); Leg G exercises the `pricing`/mode dimension that
+    Leg E deliberately does not touch, so it checks the PROPOSED schema's
+    verdict against the expected rule rather than parity with baseline."""
+    pv = make_validator(VARIANT_URL, prop_store)
+    pp = make_validator(PRODUCT_URL, prop_store)
+    rng = random.Random(20261005)
+    mismatches = 0
+    for i in range(n):
+        v, amount, currency = random_priced_base(rng)
+        mode = rng.choice(ALL_MODE_CHOICES)
+        with_price = rng.random() < 0.5
+        inst = apply_mode_and_price(v, amount, currency, mode, with_price)
+        want = expected_proposed_valid(mode, with_price)
+        got = is_valid(pv, inst)
+        if got != want:
+            mismatches += 1
+            print(f"  [FAIL] variant#{i} mode={mode!r} with_price={with_price}: "
+                  f"proposed={got} (want {want})")
+            if not got:
+                print(f"         error: {first_error(pv, inst)[:160]}")
+
+    # Mixed-mode products: several variants, each with an independently
+    # chosen mode/price combination; product-level price_range requiredness
+    # follows "required unless some variant lacks `price`" (verified
+    # separately in product.json's own allOf, not re-derived here) — this
+    # loop only checks that the PRODUCT validator never raises for an
+    # unrecognized mode on any variant, i.e. unknown modes don't poison the
+    # whole product.
+    for i in range(n):
+        variants = []
+        any_priceless = False
+        for _ in range(rng.randint(2, 4)):
+            v, amount, currency = random_priced_base(rng)
+            mode = rng.choice(ALL_MODE_CHOICES)
+            with_price = rng.random() < 0.5 if mode not in (None, "public") else True
+            if mode in ("quote_required", "contract_only"):
+                with_price = False
+            if not with_price:
+                any_priceless = True
+            variants.append(apply_mode_and_price(v, amount, currency, mode, with_price))
+        priced_amounts = [vv["price"]["amount"] for vv in variants if "price" in vv]
+        product = {
+            "id": f"prod_mixedmode_{i}",
+            "title": "Mixed Mode Fuzz",
+            "description": {"plain": "fuzz"},
+            "variants": variants,
+        }
+        if priced_amounts:
+            cur = next(vv["price"]["currency"] for vv in variants if "price" in vv)
+            product["price_range"] = {
+                "min": {"amount": min(priced_amounts), "currency": cur},
+                "max": {"amount": max(priced_amounts), "currency": cur},
+            }
+        # Every variant with an unrecognized mode must not, by itself, make
+        # the product invalid (it should validate or fail solely on the
+        # documented price/price_range rules, never on "unrecognized mode").
+        got = is_valid(pp, product)
+        # We don't assert a fixed verdict here (mixed combinations can
+        # legitimately be invalid, e.g. if price_range omitted a required
+        # value) -- we only assert the validator never errors in a way that
+        # blames an unknown mode specifically.
+        if not got:
+            err = first_error(pp, product)
+            if "mode" in err and "is not one of" in err:
+                mismatches += 1
+                print(f"  [FAIL] product#{i}: unknown mode rejected by enum-like error: {err[:160]}")
+    print(f"Leg G (pricing-mode fuzz, {n} variants + {n} mixed-mode products): {mismatches} mismatches")
+    return mismatches == 0
+
+
 def leg_sdk(sdk_path):
     """Leg F: old python SDK behavior on old vs new payloads."""
     src = pathlib.Path(sdk_path) / "src"
@@ -256,6 +389,9 @@ def main():
     print(f"--- Leg E: differential fuzz (n={args.fuzz}) ---")
     ok_fuzz = leg_fuzz(args.fuzz, base_store, prop_store)
 
+    print(f"--- Leg G: pricing-mode fuzz (n={args.fuzz}) ---")
+    ok_mode_fuzz = leg_mode_fuzz(args.fuzz, prop_store)
+
     ok_sdk = True
     if not args.skip_sdk:
         print("--- Leg F: old python SDK ---")
@@ -264,7 +400,7 @@ def main():
         if r is None:
             print("(SDK leg skipped)")
 
-    all_ok = ok_vectors and ok_fuzz and ok_sdk
+    all_ok = ok_vectors and ok_fuzz and ok_mode_fuzz and ok_sdk
     print("== RESULT:", "ALL LEGS PASS" if all_ok else "FAILURES PRESENT", "==")
     return 0 if all_ok else 1
 

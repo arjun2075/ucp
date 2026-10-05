@@ -62,17 +62,18 @@
     },
     "price": {
       "$ref": "../../common/types/price.json",
-      "description": "Current selling price. REQUIRED when `pricing` is absent or `pricing.mode` is `public` [PROPOSED: conditional requiredness — see `pricing`]. MUST NOT be present when `pricing.mode` is `quote_required` or `contract_only` [PROPOSED]. Price is the amount per one whole `quantity_unit.unit` (for example, per lb or per hour); when `quantity_unit` is absent, it is per `each`. Line total is `price × quantity × 10^-scale`, computed and rounded once by the Business; `totals` remain authoritative."
+      "description": "Current selling price. REQUIRED when `pricing` is absent or `pricing.mode` is `public` [PROPOSED: conditional requiredness — see `pricing`]. MUST NOT be present when `pricing.mode` is `quote_required` or `contract_only` [PROPOSED]. MAY be absent or present when `pricing.mode` is `buyer_specific`, or any unrecognized/unknown mode [PROPOSED — see `pricing` for the per-mode rules]. Price is the amount per one whole `quantity_unit.unit` (for example, per lb or per hour); when `quantity_unit` is absent, it is per `each`. Line total is `price × quantity × 10^-scale`, computed and rounded once by the Business; `totals` remain authoritative."
     },
     "pricing": {
       "type": "object",
-      "description": "[PROPOSED — requires a TC-approved Enhancement Proposal] Pricing state of this variant in this response. `mode` describes how price is (or is not) advertised to the caller of *this response* — it is a property of the response, not a fixed property of the variant: the same variant may be `buyer_specific` to an anonymous caller and carry a numeric price for a linked buyer. Well-known modes: `public` (default; a numeric price is advertised and `price` is REQUIRED), `buyer_specific` (price depends on the caller; a numeric `price` MAY be present when this response is addressed to a recognized buyer, and MUST be treated as specific to that caller), `quote_required` (no price is advertised; the buyer must request a quote — `price` MUST NOT be present), `contract_only` (no price is advertised; pricing exists only under contract — `price` MUST NOT be present). A Platform MUST NOT display, infer, or compute a numeric price for a variant that does not carry one in the response, and MUST NOT treat a missing price as zero (note: `amount: 0` on a present `price` still means free).",
+      "description": "[PROPOSED — requires a TC-approved Enhancement Proposal] Pricing state of this variant in this response. `mode` describes how price is (or is not) advertised to the caller of *this response* — it is a property of the response, not a fixed property of the variant: the same variant may be `buyer_specific` to an anonymous caller and carry a numeric price for a linked buyer. `mode` is an OPEN vocabulary (not a closed enum): well-known values are `public` (default; a numeric price is advertised and `price` is REQUIRED), `buyer_specific` (price depends on the caller; a numeric `price` MAY be present when this response is addressed to a recognized buyer — when present, `mode` MUST remain `buyer_specific` so a Platform can tell the value is specific to that caller; a Platform MUST NOT expose or reuse a buyer-specific price, or any value derived from it such as a product `price_range`, for a different caller; `buyer_specific` does not necessarily mean the amount was mathematically computed just for that one person — the same negotiated/list price may be visible to multiple entitled buyers while remaining non-public; the mode primarily communicates disclosure context, not individualized computation), `quote_required` (no price is advertised; the buyer must request a quote — `price` MUST NOT be present), `contract_only` (no price is advertised; pricing exists only under contract — `price` MUST NOT be present. This describes the unresolved response to a caller who has not established the necessary entitlement; once the Business resolves pricing for a recognized/entitled buyer, the response transitions to `buyer_specific` + `price` — `contract_only` itself remains a genuinely unpriced state). A Platform MUST tolerate `mode` values it does not recognize: an unrecognized `mode` MUST NOT make the payload invalid merely for being unrecognized, and `price` MAY be absent or present alongside it. When a Platform does not recognize a `mode`, it MUST treat the item conservatively as having no usable display price — it MUST NOT interpret a missing price as zero, MUST NOT display an accompanying numeric price as authoritative, and MUST exclude the item from numeric price filtering, sorting, or ranking unless it understands that mode. A generated SDK's binding for `mode` MUST preserve unknown string values rather than failing deserialization on an unrecognized enum member.",
       "required": ["mode"],
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["public", "buyer_specific", "quote_required", "contract_only"],
-          "description": "Pricing mode for this variant in this response."
+          "minLength": 1,
+          "examples": ["public", "buyer_specific", "quote_required", "contract_only"],
+          "description": "Pricing mode for this variant in this response. Open vocabulary: well-known values are listed in `examples`, but this is not a closed set — a Business MAY introduce new values, and a Platform MUST tolerate values it does not recognize (see parent `pricing` description for the required safe-fallback behavior)."
         },
         "reason": {
           "type": "string",
@@ -80,7 +81,7 @@
         },
         "next_step": {
           "type": "string",
-          "description": "Well-known values: `request_quote`. What the buyer can do next to obtain a price. Informational only; it defines no quote, RFQ, or identity-linking workflow."
+          "description": "Well-known values: `request_quote`, meaning a quote-related interaction is available. Identifies a well-known pricing-related interaction the Business wishes to expose in connection with the variant. Its presence does not imply that the interaction is mandatory and does not determine whether a usable price is present: `request_quote` means a quote path is available; `pricing.mode` determines whether obtaining a quote is necessary to obtain a usable price. It MAY coexist with a numeric `price` — for example `buyer_specific` + `price` + `request_quote` (caller already has a usable price; a quote path is additionally available) or `public` + `price` + `request_quote` (a public price exists; the Business also accepts quote requests). `next_step` MUST NOT participate in, or be used to infer, `price` requiredness or range/filter eligibility — those depend solely on `pricing.mode`. Informational only; it defines no quote, RFQ, or identity-linking workflow."
         }
       }
     },
@@ -149,7 +150,7 @@
   },
   "allOf": [
     {
-      "description": "[PROPOSED] Neither `price` nor `unit_price` (a per-unit selling price) may be present when the variant advertises no price in this response.",
+      "description": "[PROPOSED] Neither `price` nor `unit_price` (a per-unit selling price) may be present when the variant advertises `quote_required` or `contract_only` — both known modes are genuinely unpriced states: `quote_required` says a quote is needed to resolve pricing, and `contract_only` describes the unresolved response to a caller who has not established the necessary entitlement. Once the Business resolves pricing for a recognized/entitled buyer, the response transitions to `buyer_specific` + `price` rather than retaining `contract_only` with a price. An unrecognized/unknown `mode` is not constrained by this rule (it checks only these two known literal values, not a closed set on `mode` itself).",
       "if": {
         "properties": {
           "pricing": {

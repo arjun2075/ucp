@@ -1,5 +1,30 @@
 # COMPATIBILITY — validation evidence for the price-on-request prototype
 
+> **UPDATED 2026-10-05 following maintainer feedback (evoleinik, juanferrub).**
+> `pricing.mode` is now an open vocabulary (no closed enum). This first-pass
+> update also relaxed `contract_only` to no longer forbid `price` (relaxed,
+> not resolved — see DESIGN.md §2B); **that relaxation was reverted by the
+> second update below, and `contract_only` once again forbids `price`.**
+> Priced `buyer_specific` responses are now the proposed normative behavior.
+> Two of the "narrows" rows below (`bogus_mode_variant.json` and
+> `unknown_mode_negotiated_with_price.json`) have **changed verdict** as a
+> direct consequence: unknown modes now validate under proposed instead of
+> being rejected. This section is corrected accordingly; superseded readings
+> are struck through rather than silently deleted. The overall "not purely
+> additive" conclusion is **unchanged** — see the new third compatibility
+> class below and §4/§5's updated narrowing-class counts.
+>
+> **SECOND UPDATE, same date, `contract_only` REVERSAL.** New maintainer
+> guidance resolves `contract_only` as a genuinely unpriced state (the
+> caller-state transition: stranger with gated price → `contract_only`;
+> entitled buyer → `buyer_specific` + price). The schema reverts the relaxation
+> above: `price` + `contract_only` is **re-added** to the rejected-combination
+> list it had been removed from. `onrequest_variant_contract_only_priced.json`
+> flips from valid → **invalid** under proposed. The open-vocabulary change to
+> unknown `mode` *values* (the first update above) is unaffected and remains
+> valid. The "not purely additive" conclusion stays unchanged; see the dated
+> notes inline below and the updated §1 table, §4, §5, §6.
+
 **Method:** real validators against pinned trees — `jsonschema` 4.10.3 (draft
 2020-12) for schema legs, `pydantic` 2.13.5 for the Python SDK leg, and the
 published `@ucp-js/sdk@0.5.1` tarball (zod-generated schemas) for the JS SDK leg.
@@ -24,7 +49,7 @@ Legs A–D, 28 fixture vectors (`harness/vectors.json` + `harness/fixtures/`):
 | `onrequest_product_all_norange.json` | invalid | valid | all-on-request product w/o range |
 | `conflict_variant_price_and_quote_required.json` | valid (marker ignored) | **invalid** | conflicting signals rejected under proposed |
 | `accidental_priceless_variant.json` | invalid | invalid | accidental omission stays an error under both |
-| `bogus_mode_variant.json` | valid (marker ignored) | **invalid** | unknown modes fail closed |
+| `bogus_mode_variant.json` | valid (marker ignored) | valid | ~~unknown modes fail closed~~ **UPDATED 2026-10-05: unknown modes now validate under proposed (open vocabulary, point 1/2 of maintainer feedback) — no longer a narrowing case** |
 | `onrequest_product_all_with_range.json` | invalid | invalid | all-on-request product MUST NOT carry a range |
 | `onrequest_variant_quote_required_with_list_price.json` | invalid | valid | `list_price` is a legitimate reference on an unpriced variant |
 | `onrequest_variant_quote_required_with_unit_price.json` | invalid | invalid | `unit_price` is a per-unit selling price: banned with no-price modes |
@@ -37,9 +62,17 @@ Legs A–D, 28 fixture vectors (`harness/vectors.json` + `harness/fixtures/`):
 | `malformed_pricing_empty_object_with_price.json` | valid (marker ignored) | **invalid** | `pricing: {}` narrows — `mode` is required (Worker-C) |
 | `pricing_public_with_vendor_extension.json` | valid | valid | unknown fields inside `pricing` stay open (Worker-C) |
 | `pricing_mode_array_with_price.json` | valid (marker ignored) | **invalid** | mode present but `pricing` not an object — narrows (Worker-C) |
-| `unknown_mode_negotiated_with_price.json` | valid (marker ignored) | **invalid** | unknown mode `negotiated` fails closed — narrows (Worker-C) |
+| `unknown_mode_negotiated_with_price.json` | valid (marker ignored) | valid | ~~unknown mode `negotiated` fails closed — narrows (Worker-C)~~ **UPDATED 2026-10-05: unknown mode `negotiated` now validates under proposed (open vocabulary) — no longer a narrowing case** |
 | `unit_price_without_price_no_marker.json` | invalid | invalid | `unit_price` requires `price` under both, marker or not (Worker-C) |
 | `pricing_public_without_price.json` | invalid | invalid | `public` keeps released price-requiredness (Worker-C) |
+| `unknown_mode_future_noprice.json` | invalid | valid | ADDED 2026-10-05: unknown future-looking mode, no price — safe-fallback shape validates under proposed |
+| `onrequest_variant_contract_only_priced.json` | valid | **invalid** | REVERSED 2026-10-05 (second update): `contract_only` WITH a numeric price. Was schema-valid under the first update's relaxed rule; now rejected again — `contract_only` is resolved as a genuinely unpriced state, and rule 1's "forbid price" condition is restored to cover both `quote_required` and `contract_only` |
+| `onrequest_product_scenario_a_public_to_buyer_specific_anonymous.json` | valid | valid | ADDED 2026-10-05: Scenario A anonymous state (ordinary public price) |
+| `onrequest_product_scenario_a_public_to_buyer_specific_resolved.json` | valid | valid | ADDED 2026-10-05: Scenario A resolved state (`buyer_specific` + price, mode retained) |
+| `onrequest_product_scenario_b_contract_only_anonymous.json` | invalid | valid | ADDED 2026-10-05: Scenario B anonymous state (`contract_only`, no price, no range) |
+| `onrequest_product_scenario_b_buyer_specific_resolved.json` | valid | valid | ADDED 2026-10-05: Scenario B resolved state (`contract_only` → `buyer_specific` + price — RESOLVED as the selected working design in the second update, not merely "the prototype's cleanest representation") |
+| `onrequest_product_mixed_withrange.json` | invalid | valid | ADDED 2026-10-05: mixed product with a present `price_range` computed only over priced variants ($100–$150, never zero-filled) |
+| `onrequest_product_buyer_specific_range.json` | valid | valid | ADDED 2026-10-05: `buyer_specific` priced variants producing a caller-specific `price_range` ($80–$110), subject to the same cache-isolation requirement as the underlying prices |
 
 **Validity changes, baseline → proposed (qualified compatibility analysis):**
 
@@ -48,28 +81,49 @@ Legs A–D, 28 fixture vectors (`harness/vectors.json` + `harness/fixtures/`):
 | Priced, no `pricing` field | valid | valid | no change (fuzz covers generated subset only) |
 | Priceless, no marker | invalid | invalid | no change — accidental omission stays an error |
 | Priceless + valid marker | invalid | valid | the intended gap closure |
-| `price` + `pricing.mode: quote_required`/`contract_only` | valid (marker ignored via `additionalProperties`) | **invalid** | **narrows** — conflict rejection |
-| `pricing.mode` = unknown value | valid (`additionalProperties`) | **invalid** | **narrows** — closed enum |
-| `pricing` = null / `{}` / non-object (mode-shaped junk), with `price` present | valid (`additionalProperties` — the field was just an ignored extension) | **invalid** | **narrows** — `pricing` must now be a well-formed object (Worker-C) |
-| Priced + `pricing` marker (`public`/`buyer_specific`) | valid | valid | no change — but the field is *reinterpreted*, not new |
-| `pricing` carrying unknown extra fields (e.g. `vendor_note`) | valid | valid | no change — the object stays open; only `mode` is a closed enum (Worker-C) |
+| `price` + `pricing.mode: quote_required` | valid (marker ignored via `additionalProperties`) | **invalid** | **narrows** — conflict rejection |
+| `price` + `pricing.mode: contract_only` | valid (marker ignored) | **invalid** | ~~narrows — conflict rejection~~ ~~UPDATED 2026-10-05 (first update): no longer narrows (relaxed)~~ **RE-REVERSED 2026-10-05 (second update): narrows again** — `contract_only` is resolved as a genuinely unpriced state; the first update's relaxation is reverted, and this combination is rejected under proposed exactly as it was before the first update |
+| `pricing.mode` = unknown value | valid (`additionalProperties`) | valid | ~~**narrows** — closed enum~~ **UPDATED 2026-10-05: no longer narrows** — `mode` is now an open vocabulary (point 1 of maintainer feedback); an unknown mode validates with or without `price`, subject to the behavioral safe-fallback contract (point 2) |
+| `pricing` = null / `{}` / non-object (mode-shaped junk), with `price` present | valid (`additionalProperties` — the field was just an ignored extension) | **invalid** | **narrows** — `pricing` must still be a well-formed object with a non-empty string `mode` (Worker-C); this narrowing is unrelated to and unaffected by the open-vocabulary change — it concerns the *shape* of `pricing`, not the *value space* of `mode` |
+| Priced + `pricing` marker (`public`/`buyer_specific`/`contract_only`/unknown) | valid | valid | no change — but the field is *reinterpreted*, not new |
+| `pricing` carrying unknown extra fields (e.g. `vendor_note`) | valid | valid | no change — the object stays open; `mode` is now also open, so only the object *shape* (type, required `mode`, `mode` as non-empty string) is enforced (Worker-C) |
 
 The last three rows defeat two false claims previously present in this
 handoff: (1) "any payload containing `pricing` is new by definition" is
 **false** — the baseline schema permits additional properties, so a
 `pricing` field could already exist in the wild (e.g. a vendor extension)
 and would be reinterpreted; (2) "no previously-valid payload becomes
-invalid" is **false** — the conflict and unknown-mode classes narrow.
+invalid" is **false** — the malformed-`pricing`-shape class still narrows,
+even after the open-vocabulary update (the conflict-rejection narrowing is
+now scoped to `quote_required` AND `contract_only` again as of the second
+2026-10-05 update — see below — and the unknown-mode narrowing is gone
+entirely).
 
-**Legs A–D: 28 passed, 0 failed** (`logs/harness_run1.log`, re-run
-`logs/pass2_harness_run.log`, and `logs/workerC_harness_run.log` with the 8
-Worker-C malformed/colliding vectors, exit 0). Six vectors added 2026-10-02 for
-numeric-price consistency (`list_price` reference legitimacy, `unit_price`
-conflict rules, `list_price_range` omission rule); eight vectors added
-2026-10-02 for malformed/colliding/unknown-mode shapes (null marker, bare
-string, empty object, non-object mode carrier, second unknown-mode string,
-vendor extension, `unit_price`-without-`price` without marker, `public`
-without price).
+**Legs A–D: 42 passed, 0 failed as of the second 2026-10-05 update**
+(`logs/harness_run1.log`, re-run `logs/pass2_harness_run.log`,
+`logs/workerC_harness_run.log` with the 8 Worker-C malformed/colliding
+vectors, the first-update maintainer-feedback rerun with the 8 added
+vectors, and the second update's `contract_only` reversal + six added
+vectors, all exit 0). Six
+vectors added 2026-10-02 for numeric-price consistency (`list_price`
+reference legitimacy, `unit_price` conflict rules, `list_price_range`
+omission rule); eight vectors added 2026-10-02 for malformed/colliding/
+unknown-mode shapes (null marker, bare string, empty object, non-object mode
+carrier, second unknown-mode string, vendor extension,
+`unit_price`-without-`price` without marker, `public` without price); eight
+vectors added 2026-10-05 (first update) for the maintainer feedback update
+(unknown mode with no price, `contract_only` with a price, two Scenario-A and
+two Scenario-B product fixtures, a mixed-product present-range fixture, and a
+`buyer_specific` caller-specific-range fixture); six vectors added 2026-10-05
+(second update, the `contract_only` reversal) for the NDA/orthogonality cases
+(`public_with_price`, `contract_only_without_price`,
+`buyer_specific_with_price_and_quote_step`, `public_with_price_and_quote_step`,
+`quote_required_with_price_and_quote_step`, and
+`onrequest_product_unknown_mode_mixed`), plus one fixture (`onrequest_variant_contract_only_priced.json`)
+whose expected verdict flipped from valid to invalid. A new harness Leg G
+(`harness/run.py`) additionally fuzzes the pricing-mode dimension directly —
+see §6 below; its `expected_proposed_valid` helper was updated to require
+`contract_only` to forbid `price`, matching the reversed rule.
 
 ## 2. Differential fuzz (Leg E) — scoped no-regression claim
 
@@ -116,14 +170,50 @@ three above). It does **not** universally hold:
 
 ## 4. Version / capability implications (stated honestly)
 
-- **Not purely additive — qualified compatibility:** the proposal *relaxes*
+- **Not purely additive — qualified compatibility (UPDATED 2026-10-05, second
+  pass: still true, and the `contract_only` reversal ADDS BACK a narrowing
+  case the first pass had removed).** The proposal *relaxes*
   `price`/`price_range` requiredness for the on-request cases, but it also
-  *narrows* validity for four payload classes (conflict rejection,
-  unknown-mode rejection, and the malformed-`pricing` shapes — null, `{}`,
-  non-object mode carrier; see §1 table and §5). Old validators *reject* new
-  on-request payloads rather than misreading them — the safe direction for
-  validating consumers — but a business already emitting a `pricing`-shaped
-  extension field could see its payloads newly rejected.
+  *narrows* validity for payload classes that remain narrowed: conflict
+  rejection — now scoped to **both** `quote_required` AND `contract_only`
+  again (the second update reverses the first update's narrowing of this
+  scope down to `quote_required` only) — and the malformed-`pricing` shapes
+  (null, `{}`, non-object mode carrier; see §1 table and §5). The unknown-mode
+  narrowing class from the original closed-enum version of this document
+  still **does not apply** — unknown `mode` *values* still validate under
+  proposed (open vocabulary, point 1/2 of the first maintainer feedback
+  update) — that part is unaffected by the `contract_only` reversal, which
+  concerns a different rule (the `price`+known-mode conflict rule, not the
+  `mode` value-space constraint). Net effect: the narrowing-class count is the
+  same shape as before the first update (conflict rejection covers two known
+  modes again, plus the malformed-`pricing`-shape class), not a
+  reclassification of the change as purely additive. Old validators *reject*
+  new on-request payloads rather than misreading them — the safe direction
+  for validating consumers — but a business already emitting a
+  `pricing`-shaped extension field could see its payloads newly rejected.
+- **NEW (2026-10-05) — generated-SDK closed-enum compatibility class:** a
+  consumer generated from a closed `mode` enum (for example, a generated SDK
+  that binds `mode` to a closed language enum type) may reject or fail to
+  deserialize a payload carrying a future/unrecognized `mode` value, even
+  though the schema itself now accepts it. This is a *codegen* compatibility
+  concern distinct from the schema-level classes above: closing this gap
+  requires representing `mode` as an extensible/open string type in codegen
+  (not a fixed enum), so that a generated SDK's binding preserves unknown
+  string values rather than failing deserialization on an unrecognized enum
+  member (see DESIGN.md §2's dated note and the EP draft's SDK note). No SDK
+  regeneration was performed as part of this update; this class is
+  documented, not resolved.
+- **NEW (2026-10-05, second update) — Purchase Options (#901) interoperability/
+  composition risk, not a released-client compatibility result:** a
+  concurrent draft issue (#901), as proposed, requires `price` on every
+  `purchase_options[]` entry, which cannot represent an unpriced
+  `quote_required`/`contract_only` purchase option. This repo has no
+  `purchase_options` schema today (verified by grep), so this is not a
+  schema-level compatibility class measurable against anything in this repo
+  — it is a forward-looking composition risk, documented in DESIGN.md §2D as
+  prose/illustration only, explicitly NOT counted in this document's fixture
+  tables or the harness's pass/fail legs, and NOT resolved by loosening
+  `quote_required`/`contract_only` to carry a price.
 - **Release classification UNRESOLVED:** whether this ships as a minor or
   major change is pending the project's versioning decision (date-based
   versioning; breaking changes require Governing Council majority per
@@ -318,17 +408,46 @@ pattern cannot distinguish accidental omission from intentional on-request
    rejection" claim is accordingly scoped to validating consumers.
 4. **Narrowing is bounded by the open object.** `pricing_public_with_vendor_extension.json`
    stays valid under both schemas: unknown fields inside `pricing` pass
-   through. The narrowing classes are exactly: conflict, unknown `mode`
-   values, and malformed (`null`/`{}`/non-object) `pricing` — a vendor
-   extension that merely *adds* fields to a well-formed marker is not
-   affected.
+   through. **UPDATED 2026-10-05, second pass:** the narrowing classes are
+   now exactly: conflict (`quote_required` + price AND `contract_only` +
+   price, again, per the resolved per-caller transition), and malformed
+   (`null`/`{}`/non-object) `pricing` — a vendor extension that merely *adds*
+   fields to a well-formed marker is not affected, and unknown `mode`
+   *values* still do not narrow (open vocabulary, unaffected by the
+   `contract_only` reversal).
+
+## 6. Pricing-mode fuzz (Leg G, added 2026-10-05)
+
+A new harness leg (`harness/run.py::leg_mode_fuzz`) crosses `pricing` absent,
+every known mode (`public`, `buyer_specific`, `quote_required`,
+`contract_only`), and several future-looking unknown mode strings
+(`negotiated_tier`, `auction_pending`, `dynamic_offer`, `partner_price_v2`)
+with price absent/present, including mixed-mode products (several variants,
+each independently assigned a mode/price combination). It asserts the
+PROPOSED schema's verdict matches the documented `allOf` rule for each
+`(mode, price-presence)` combination, and in particular that an unrecognized
+mode never causes rejection merely for being unrecognized. This is a
+different invariant from Leg E (which checks baseline/proposed agreement on
+a generated all-priced, no-`pricing` subset) — Leg E's existing contract is
+unchanged; Leg G is additive and exercises the `pricing`/mode dimension Leg E
+deliberately does not touch. Result as of the first 2026-10-05 rerun: 300
+variants + 300 mixed-mode products, 0 mismatches, exit 0. **Second update (same date):**
+`leg_mode_fuzz`'s `expected_proposed_valid` helper was corrected so
+`contract_only` (like `quote_required`) expects `price` to be absent — the
+rerun after the `contract_only` reversal again reports 300+300, 0 mismatches,
+exit 0 (see the dated log under `logs/` for this round).
 
 ### Release classification: still UNRESOLVED
 
-Nothing in §5 changes §4's versioning position: the change *relaxes*
-requiredness for the on-request classes but *narrows* validity for four
-payload classes (conflict, unknown mode, malformed `pricing`; §1 table).
-Whether that ships as minor or major is pending the project's versioning
-decision (date-based versioning; breaking changes require Governing
-Council majority per CONTRIBUTING.md). The `feat:` prefix in the patch
-header and PR_DRAFT remains **provisional**, not a final classification.
+Nothing in §5/§6 changes §4's versioning position: the change *relaxes*
+requiredness for the on-request classes but *narrows* validity for the
+conflict class — now `quote_required` **and** `contract_only` + price again,
+per the second 2026-10-05 update's reversal — and the malformed-`pricing`-shape
+classes (§1 table). The unknown-mode narrowing remains removed (open
+vocabulary, unaffected by the `contract_only` reversal); the `contract_only`
+narrowing is restored. Net narrowing-class count: conflict (two known modes)
++ malformed-shape — the same shape as the pre-first-update baseline, not a
+net reduction. Whether that ships as minor or major is pending the project's
+versioning decision (date-based versioning; breaking changes require
+Governing Council majority per CONTRIBUTING.md). The `feat:` prefix in the
+patch header and PR_DRAFT remains **provisional**, not a final classification.
