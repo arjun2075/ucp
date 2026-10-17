@@ -61,6 +61,14 @@ merchants MAY support additional custom filters via `additionalProperties`.
 
 {{ schema_fields('types/price_filter', 'shopping/catalog') }}
 
+Variants without a range-eligible price (see
+[Pricing state](index.md#pricing-state)) are excluded from price-filter
+matching. This includes variants without `price` and variants whose pricing
+mode is unknown to the implementation, even if they carry a number. A filter
+**MUST NOT** treat a missing price as zero or use a price whose semantics it
+does not understand. The Business **MAY** surface excluded variants through a
+message.
+
 ## Pagination
 
 Cursor-based pagination for list operations. Cursors are opaque strings. A

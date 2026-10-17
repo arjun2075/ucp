@@ -4,11 +4,30 @@
   "title": "Product",
   "description": "A product in the catalog with variants and options.",
   "type": "object",
+  "$defs": {
+    "range_eligible_variant": {
+      "description": "A variant with a price whose well-known pricing mode makes it usable for this caller.",
+      "required": ["price"],
+      "anyOf": [
+        { "not": { "required": ["pricing"] } },
+        {
+          "properties": {
+            "pricing": {
+              "properties": {
+                "mode": { "enum": ["public", "buyer_specific"] }
+              },
+              "required": ["mode"]
+            }
+          },
+          "required": ["pricing"]
+        }
+      ]
+    }
+  },
   "required": [
     "id",
     "title",
     "description",
-    "price_range",
     "variants"
   ],
   "properties": {
@@ -42,7 +61,7 @@
     },
     "price_range": {
       "$ref": "../../common/types/price_range.json",
-      "description": "Price range across all variants."
+      "description": "Price range across range-eligible variants. [PROPOSED: a range-eligible variant has a numeric `price` and either no `pricing` object, `pricing.mode: public`, or `pricing.mode: buyer_specific`. A variant with an unknown mode is not range-eligible even if it carries a numeric price. `price_range` is REQUIRED when every variant is range-eligible, MAY be omitted when the product mixes eligible and ineligible variants, and MUST be omitted when no variant is eligible. When present, it MUST be computed only over eligible variants and MUST NOT zero-fill or synthesize prices. A range derived from `buyer_specific` prices is caller-specific and MUST be isolated from other callers. `list_price_range` follows the same omission rule when no range-eligible variant exists.]"
     },
     "list_price_range": {
       "$ref": "../../common/types/price_range.json",
@@ -85,5 +104,42 @@
       "type": "object",
       "description": "Business-defined custom data extending the standard product model."
     }
-  }
+  },
+  "allOf": [
+    {
+      "description": "[PROPOSED] `price_range` is REQUIRED when every variant has a range-eligible price.",
+      "if": {
+        "properties": {
+          "variants": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/range_eligible_variant" }
+          }
+        },
+        "required": ["variants"]
+      },
+      "then": { "required": ["price_range"] }
+    },
+    {
+      "description": "[PROPOSED] Range fields MUST be omitted when no variant has a range-eligible price.",
+      "if": {
+        "properties": {
+          "variants": {
+            "type": "array",
+            "not": {
+              "contains": { "$ref": "#/$defs/range_eligible_variant" }
+            }
+          }
+        },
+        "required": ["variants"]
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            { "required": ["price_range"] },
+            { "required": ["list_price_range"] }
+          ]
+        }
+      }
+    }
+  ]
 }
