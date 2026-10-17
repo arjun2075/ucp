@@ -241,6 +241,96 @@ item they present as featured.
 
 {{ schema_fields('types/variant', 'shopping/catalog') }}
 
+#### Pricing state
+
+!!! note "Proposed — requires a TC-approved Enhancement Proposal"
+    The pricing-state model in this section is a **prototype** responding to
+    UCP issue #877 ("price on request"). It is not part of the released
+    specification: core schema changes require an Enhancement Proposal and
+    Technical Council approval before implementation.
+
+A variant's `pricing` object states how price is — or is not — advertised
+**in this response**. The mode describes the response, not a fixed property of
+the variant: the same variant may be `buyer_specific` to an anonymous caller
+and carry a numeric price once the caller links their identity (see
+[Identity Linking](../../common/identity-linking/index.md)).
+
+| `pricing.mode` | Meaning | `price` in this response |
+|---|---|---|
+| `public` | A numeric price is advertised (the default when `pricing` is absent). | REQUIRED |
+| `buyer_specific` | Price depends on the caller. | MAY be present when the response is addressed to a recognized buyer; MUST be treated as specific to that caller. Which buyers see which price is Business policy — the schema carries no access-control semantics. |
+| `quote_required` | No price is advertised; the buyer must request a quote. | MUST NOT be present |
+| `contract_only` | No price is advertised; pricing exists only under contract. | MUST NOT be present |
+
+`mode` is an open vocabulary. An unknown value does not invalidate the
+record merely because it is unknown. Until a Platform understands that mode,
+it **MUST NOT** present an accompanying amount as an authoritative selling
+price or include it in numeric filtering, sorting or price comparison.
+
+An entitled caller's resolved contract price uses `buyer_specific` plus
+`price`; `contract_only` remains unpriced. A priced `buyer_specific` response
+retains that mode even when the same amount is available to other entitled
+buyers. Platforms **MUST NOT** reuse its prices or derived values such as
+`price_range` outside the authorization context for which they were returned.
+Isolation must account for buyer, entitlement changes, negotiated capabilities
+and any other price-relevant context; the mode string alone is insufficient.
+
+`next_step: "request_quote"` is only a prototype interaction hint. It may
+accompany a public or buyer-specific price and never changes requiredness or
+filter eligibility. It identifies no endpoint or supported quote workflow.
+
+A Platform **MUST NOT** display, infer, or compute a numeric price for a
+variant that does not carry one in the response, and **MUST NOT** treat a
+missing price as zero (a present `price` with `amount: 0` still means free).
+A variant that is explicitly on-request is therefore distinguishable from a
+variant whose price was accidentally omitted: the latter fails validation
+(`price` is required for publicly priced variants). For in-proximity
+"price on request" rendering, Businesses **SHOULD** pair the variant with the
+well-known `price_on_request` warning code using `presentation: "disclosure"`.
+
+Related price fields on unpriced variants: `list_price` (the pre-discount
+reference price) MAY accompany an unpriced variant — for example, a
+strikethrough "List $100" beside a "request quote" disclosure — but it MUST
+NOT be treated as the selling price. `unit_price`, by contrast, is a per-unit
+*selling* price: it MUST NOT be present when the variant carries no `price`
+(schema-enforced), since it would be a conflicting price signal.
+
+How an on-request variant becomes purchasable is outside this proposal.
+Identity linking can establish buyer context but does not itself guarantee
+price resolution. Accepted-term handoff (#845) and Quote (#929/#930) remain
+separate proposals, not established catalog behavior.
+This section defines no quote, RFQ, expiry, invoice, or payment workflow.
+
+<!-- ucp:example schema=shopping/catalog_lookup op=get_product -->
+```json
+{
+  "ucp": { "version": "{{ ucp_version }}" },
+  "product": {
+    "id": "prod_industrial_printer",
+    "title": "Industrial Printer",
+    "description": { "plain": "High-volume printer, available in standard and custom-enterprise configurations." },
+    "price_range": {
+      "min": { "amount": 1000000, "currency": "USD" },
+      "max": { "amount": 1000000, "currency": "USD" }
+    },
+    "variants": [
+      {
+        "id": "var_industrial_printer_standard",
+        "title": "Standard configuration",
+        "description": { "plain": "Stocked configuration with a published price." },
+        "price": { "amount": 1000000, "currency": "USD" }
+      },
+      {
+        "id": "var_industrial_printer_custom",
+        "title": "Custom enterprise configuration",
+        "description": { "plain": "Built-to-order configuration priced on quoted terms." },
+        "pricing": { "mode": "quote_required", "next_step": "request_quote" }
+      }
+    ]
+  }
+}
+```
+
 ### Price
 
 {{ schema_fields('types/price', 'shopping/catalog') }}
@@ -248,6 +338,23 @@ item they present as featured.
 ### Price Range
 
 {{ schema_fields('types/price_range', 'shopping/catalog') }}
+
+When every variant has an ordinary/public or resolved buyer-specific selling
+price, `price_range` remains required. If a variant has no price or uses an
+unrecognized mode, `price_range` **MAY** be omitted. When present it **MUST**
+aggregate only eligible selling prices for this response, without zero-filling
+missing amounts; a partial range describes the priced subset, not every
+variant. When no eligible price exists, no usable selling range exists.
+
+A Platform that does not understand a mode **MUST** suppress or recompute a
+received range rather than assume that every included amount is usable.
+JSON Schema validates structure, not arithmetic or a consumer's understanding
+of extension modes. The schema forbids either range when no variant carries
+a numeric price; behavioral rules additionally govern numeric but unusable
+unknown-mode amounts. `list_price_range` remains a reference-price range,
+never a substitute for a selling price, and follows the same context isolation.
+Product-based feed representations inherit these rules; this does not claim
+that a proposed feed capability has been adopted.
 
 ### Media
 
