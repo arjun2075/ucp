@@ -83,7 +83,7 @@ jobs:
         run: uv run python scripts/test_validate_examples.py
 
       - name: Run catalog pricing-state contract tests
-        run: uv run python scripts/test_catalog_pricing_states.py
+        run: uv run --with jsonschema==4.26.0 python scripts/test_catalog_pricing_states.py
 
       - name: Run schema table macro tests
         run: uv run python scripts/test_schema_tables.py
