@@ -91,7 +91,7 @@ class ReferenceTraceTests(unittest.TestCase):
             ),
         )
 
-    def test_unnegotiated_empty_disclosure_remains_unknown(self):
+    def test_not_negotiated_empty_disclosure_remains_unknown(self):
         self.assertEqual(
             "unknown",
             reference.classify_disclosure(
