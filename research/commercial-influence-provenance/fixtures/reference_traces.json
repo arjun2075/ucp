@@ -1,0 +1,78 @@
+{
+  "traces": [
+    {
+      "capability": "io.github.arjun2075.shopping.commercial_influence",
+      "trace_id": "paid-placement-ordering",
+      "statement": {
+        "id": "ci_paid_placement_1",
+        "actor": {"id": "marketplace.example"},
+        "asserter": {"id": "marketplace.example"},
+        "kind": "ranking",
+        "effect": "ordering",
+        "basis": "paid_placement",
+        "sponsor": {"id": "seller-b.example"}
+      },
+      "bindings": [
+        {"stage": "catalog", "subject_ref": "search_result:product-7", "statement_digest": "74aa71f58dd1db0e6f2f817b941853d5c73372d7f793e921406d9f149d61a099", "predecessor_binding_digest": null, "binding_digest": "bd91cb1ca5c0d295acdd480338729bf13c1ee67a28ab5ad4d83709ceda2c4d8e"},
+        {"stage": "offer", "subject_ref": "offer:42", "statement_digest": "74aa71f58dd1db0e6f2f817b941853d5c73372d7f793e921406d9f149d61a099", "predecessor_binding_digest": "bd91cb1ca5c0d295acdd480338729bf13c1ee67a28ab5ad4d83709ceda2c4d8e", "binding_digest": "ff59d4908215f1c54305b090b5fb4a9bc493cce6f3c08e52f96327365195b6a1"},
+        {"stage": "cart", "subject_ref": "cart_line_item:98", "statement_digest": "74aa71f58dd1db0e6f2f817b941853d5c73372d7f793e921406d9f149d61a099", "predecessor_binding_digest": "ff59d4908215f1c54305b090b5fb4a9bc493cce6f3c08e52f96327365195b6a1", "binding_digest": "c10180ddd392580c9e060ff263f2b99b4ae4279fccc10390274dc3411c1c2ae4"},
+        {"stage": "checkout", "subject_ref": "checkout_line_item:98", "statement_digest": "74aa71f58dd1db0e6f2f817b941853d5c73372d7f793e921406d9f149d61a099", "predecessor_binding_digest": "c10180ddd392580c9e060ff263f2b99b4ae4279fccc10390274dc3411c1c2ae4", "binding_digest": "51b9bdb8b993bdbe47791427a7dc949fae8fc15808f3acb743f25cd662c63f4a"}
+      ]
+    },
+    {
+      "capability": "io.github.arjun2075.shopping.commercial_influence",
+      "trace_id": "marketplace-cross-sell",
+      "statement": {
+        "id": "ci_cross_sell_1",
+        "actor": {"id": "marketplace.example"},
+        "asserter": {"id": "marketplace.example"},
+        "kind": "cross_sell",
+        "effect": "proposal",
+        "basis": "platform_merchandising"
+      },
+      "bindings": [
+        {"stage": "catalog", "subject_ref": "product:laptop-1", "statement_digest": "46f6ab142a28be36aebda14bff90b6e0884126d8833ed2bd39dbb615bc9d08df", "predecessor_binding_digest": null, "binding_digest": "1b33449c55c9e170537689bdf4a7ec919ed81a6ae7f5bc56ac94910a7af02c88"},
+        {"stage": "offer", "subject_ref": "offer:usb-hub", "statement_digest": "46f6ab142a28be36aebda14bff90b6e0884126d8833ed2bd39dbb615bc9d08df", "predecessor_binding_digest": "1b33449c55c9e170537689bdf4a7ec919ed81a6ae7f5bc56ac94910a7af02c88", "binding_digest": "5338f9a0fa7af3a8be9ca802e899f87d629bd0c40fe92179b2dc6c017e908554"},
+        {"stage": "cart", "subject_ref": "cart_line_item:usb-hub", "statement_digest": "46f6ab142a28be36aebda14bff90b6e0884126d8833ed2bd39dbb615bc9d08df", "predecessor_binding_digest": "5338f9a0fa7af3a8be9ca802e899f87d629bd0c40fe92179b2dc6c017e908554", "binding_digest": "89da12113355deb05f869381e6365c6e21c58578d0da2c97d8098e19fe1ffadb"},
+        {"stage": "checkout", "subject_ref": "checkout_line_item:usb-hub", "statement_digest": "46f6ab142a28be36aebda14bff90b6e0884126d8833ed2bd39dbb615bc9d08df", "predecessor_binding_digest": "89da12113355deb05f869381e6365c6e21c58578d0da2c97d8098e19fe1ffadb", "binding_digest": "6470b38d4a18b686f13c8c5d1ef25a84f7f714b73ae0f18676d60c798737b8bb"}
+      ]
+    },
+    {
+      "capability": "io.github.arjun2075.shopping.commercial_influence",
+      "trace_id": "seller-upsell",
+      "statement": {
+        "id": "ci_seller_upsell_1",
+        "actor": {"id": "seller-a.example"},
+        "asserter": {"id": "seller-a.example"},
+        "kind": "upsell",
+        "effect": "proposal",
+        "basis": "seller_merchandising"
+      },
+      "bindings": [
+        {"stage": "catalog", "subject_ref": "product:laptop-1", "statement_digest": "bf67f3cdcd878b9e2f2eb8172805b1a8c25786ba35d8f6c6a184cfb36d1d9516", "predecessor_binding_digest": null, "binding_digest": "0729cf9a8edd0e02ea6877d1848dea5dbfaae6c825665f2fe2e1e64090f62c79"},
+        {"stage": "offer", "subject_ref": "offer:ram-upgrade", "statement_digest": "bf67f3cdcd878b9e2f2eb8172805b1a8c25786ba35d8f6c6a184cfb36d1d9516", "predecessor_binding_digest": "0729cf9a8edd0e02ea6877d1848dea5dbfaae6c825665f2fe2e1e64090f62c79", "binding_digest": "4a8fc1747a5f091442691e320249cdf2356eae83118130d02c75134a3ba541a6"},
+        {"stage": "cart", "subject_ref": "cart_line_item:ram-upgrade", "statement_digest": "bf67f3cdcd878b9e2f2eb8172805b1a8c25786ba35d8f6c6a184cfb36d1d9516", "predecessor_binding_digest": "4a8fc1747a5f091442691e320249cdf2356eae83118130d02c75134a3ba541a6", "binding_digest": "73e9a8519a63da97582eb6bd998c2b45b0dcac55763645f2211ac87371a89ba8"},
+        {"stage": "checkout", "subject_ref": "checkout_line_item:ram-upgrade", "statement_digest": "bf67f3cdcd878b9e2f2eb8172805b1a8c25786ba35d8f6c6a184cfb36d1d9516", "predecessor_binding_digest": "73e9a8519a63da97582eb6bd998c2b45b0dcac55763645f2211ac87371a89ba8", "binding_digest": "4593a684190a42ccc21a56ac37c2241761e176ffa7099c681b9665be71687eb5"}
+      ]
+    },
+    {
+      "capability": "io.github.arjun2075.shopping.commercial_influence",
+      "trace_id": "affiliated-substitution",
+      "statement": {
+        "id": "ci_affiliated_substitution_1",
+        "actor": {"id": "marketplace.example"},
+        "asserter": {"id": "marketplace.example"},
+        "kind": "substitution",
+        "effect": "commerce_state",
+        "basis": "owned_or_affiliated",
+        "sponsor": {"id": "marketplace-house-brand.example"}
+      },
+      "bindings": [
+        {"stage": "catalog", "subject_ref": "product:coffee-a", "statement_digest": "dd57c30b01a4a36a2d8034561786f760b9aeb98ed87e774c8f6ae96591575fa6", "predecessor_binding_digest": null, "binding_digest": "c6cc157d67316efdef73c94119b475f0c3f1cdbbf11d2c104313066cc0fde8a2"},
+        {"stage": "offer", "subject_ref": "offer:coffee-b-substitution", "statement_digest": "dd57c30b01a4a36a2d8034561786f760b9aeb98ed87e774c8f6ae96591575fa6", "predecessor_binding_digest": "c6cc157d67316efdef73c94119b475f0c3f1cdbbf11d2c104313066cc0fde8a2", "binding_digest": "5f407221b92062064636b4a408fcbbe364fc991b678183231d42fb29b78753e4"},
+        {"stage": "cart", "subject_ref": "cart_line_item:coffee-b", "statement_digest": "dd57c30b01a4a36a2d8034561786f760b9aeb98ed87e774c8f6ae96591575fa6", "predecessor_binding_digest": "5f407221b92062064636b4a408fcbbe364fc991b678183231d42fb29b78753e4", "binding_digest": "e24ef047efbaf8ca58792d980d70ccfdba641b12bdefa73d526b28d8bc2bcab9"},
+        {"stage": "checkout", "subject_ref": "checkout_line_item:coffee-b", "statement_digest": "dd57c30b01a4a36a2d8034561786f760b9aeb98ed87e774c8f6ae96591575fa6", "predecessor_binding_digest": "e24ef047efbaf8ca58792d980d70ccfdba641b12bdefa73d526b28d8bc2bcab9", "binding_digest": "2886444550d52a2cf07bc7d1c6e587859e0c5cdf16090378a48dedf5d99f0155"}
+      ]
+    }
+  ]
+}
