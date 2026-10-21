@@ -50,6 +50,17 @@ repos:
         pass_filenames: false
         files: ^scripts/(validate_examples|test_validate_examples)\.py$
         stages: [pre-commit, pre-push]
+      - id: fx-debit-ceiling-tests
+        name: FX debit ceiling reference tests
+        entry: uv run --frozen python scripts/test_fx_debit_ceiling.py
+        language: system
+        pass_filenames: false
+        files: |
+          (?x)^(
+            scripts/(fx_debit_ceiling|test_fx_debit_ceiling)\.py|
+            scripts/fixtures/fx_debit_ceiling\.json
+          )$
+        stages: [pre-commit, pre-push]
       - id: schema-tables-tests
         name: Schema table macro tests
         entry: uv run --frozen python scripts/test_schema_tables.py

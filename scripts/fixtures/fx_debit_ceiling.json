@@ -1,0 +1,58 @@
+{
+  "decision_time": "2026-10-21T00:00:00Z",
+  "buyer_policy": {
+    "maximum_debit": {
+      "amount": 50000,
+      "currency": "USD"
+    },
+    "required_fee_categories": [
+      "provider",
+      "issuer"
+    ]
+  },
+  "checkout": {
+    "id": "chk_123",
+    "revision": "7",
+    "total": {
+      "amount": 45000,
+      "currency": "EUR"
+    }
+  },
+  "instrument": {
+    "id": "pi_card_1",
+    "handler_id": "handler_fx_1",
+    "route_id": "route_usd_presentment_1"
+  },
+  "guarantee": {
+    "type": "com.example.fx_debit_guarantee",
+    "id": "fxg_01K7A6Q4C9",
+    "provider": "Example Payments",
+    "status": "firm",
+    "issued_at": "2026-10-20T23:55:00Z",
+    "expires_at": "2026-10-21T00:05:00Z",
+    "invalidated": false,
+    "maximum_debit": {
+      "amount": 50000,
+      "currency": "USD"
+    },
+    "fee_scope": {
+      "included": [
+        "provider",
+        "issuer"
+      ],
+      "excluded": []
+    },
+    "binding": {
+      "checkout_id": "chk_123",
+      "checkout_revision": "7",
+      "checkout_total": {
+        "amount": 45000,
+        "currency": "EUR"
+      },
+      "instrument_id": "pi_card_1",
+      "handler_id": "handler_fx_1",
+      "route_id": "route_usd_presentment_1"
+    },
+    "enforced_by": "Example Payments"
+  }
+}

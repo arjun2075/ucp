@@ -82,6 +82,9 @@ jobs:
       - name: Run validator unit tests
         run: uv run python scripts/test_validate_examples.py
 
+      - name: Run FX debit ceiling reference tests
+        run: uv run python scripts/test_fx_debit_ceiling.py
+
       - name: Run schema table macro tests
         run: uv run python scripts/test_schema_tables.py
 
