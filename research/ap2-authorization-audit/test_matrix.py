@@ -123,17 +123,17 @@ def test_t0_no_change_accepts(authorized):
 
 
 def test_t1_destination_change(authorized):
-    """Same id, items, totals; selected fulfillment destination changes
-    between authorization and completion (dest_1 Springfield ->
-    dest_2 Shelbyville). Security property: the old authorization must not
-    silently authorize the changed destination."""
+    """A modeled live-state divergence (dest_1 Springfield -> dest_2
+    Shelbyville) with unchanged id/items/totals. Tests the two verifier
+    interpretations only. A protocol-permitted transition producing this
+    unsigned divergence has NOT been established."""
     signed, mandate = authorized
     current = copy.deepcopy(signed)
     current["fulfillment"]["methods"][0]["selected_destination_id"] = "dest_2"
 
     ra = complete_checkout(copy.deepcopy(current), mandate, comparator="A")
     assert ra.signature_valid and ra.mandate_valid and ra.state_equivalent
-    assert ra.decision == "accept"  # Approach A accepts — property VIOLATED
+    assert ra.decision == "accept"  # Modeled comparator A accepts; no conformance verdict
     assert ra.order_destination.startswith("dest_2")  # order ships elsewhere
 
     rb = complete_checkout(copy.deepcopy(current), mandate, comparator="B")
@@ -154,7 +154,7 @@ def test_t2_option_change_same_price(authorized):
     current["fulfillment"]["methods"][0]["groups"][0]["selected_option_id"] = "express"
 
     ra = complete_checkout(copy.deepcopy(current), mandate, comparator="A")
-    assert ra.decision == "accept"  # A cannot see the change — property VIOLATED
+    assert ra.decision == "accept"  # Comparator A cannot see this modeled change
 
     rb = complete_checkout(copy.deepcopy(current), mandate, comparator="B")
     assert rb.decision == "reject" and rb.differing_fields == ["fulfillment"]
