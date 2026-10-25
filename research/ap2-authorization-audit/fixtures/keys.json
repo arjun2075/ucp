@@ -1,0 +1,32 @@
+{
+ "merchant": {
+  "crv": "P-256",
+  "d": "abbEeWS0OCHbuOKAh3WuFM3XmgcLkhqQF-epHI8QYEk",
+  "kty": "EC",
+  "x": "flKEKTjef7jjmwV5SCkc-U8ZybhHfSKC8TjGdJX_z68",
+  "y": "jX2zt8JoK_wM9fNHgYLO5s4fdFWblI8-Om5K6ErmAzU",
+  "kid": "merchant_2026",
+  "use": "sig",
+  "alg": "ES256"
+ },
+ "platform": {
+  "crv": "P-256",
+  "d": "6f1wheR6bc8GSJtQnuOYd_dS1IHwB4eQQDSNOfKMvzw",
+  "kty": "EC",
+  "x": "zI0U9ELPe_ireHjcf5PsKzNFXu2f7cyWp8Eg4JOLAdk",
+  "y": "7gosCSKgvIe2l5-ey3xllb2w7IXsGb-uB62MzjqdacI",
+  "kid": "platform_2026",
+  "use": "sig",
+  "alg": "ES256"
+ },
+ "user": {
+  "crv": "P-256",
+  "d": "ITcpBPcL2LNNyMh7Qgk8riPQQ_LI2NjnrVddd5eoMPk",
+  "kty": "EC",
+  "x": "GDTfItj-fJzoliCSOqez9l0axi6JDkNbshiOvYTQfpQ",
+  "y": "TjrgoX6zTPGUytlrGBKuz7QARrfghUaS0lCt3Ttgnno",
+  "kid": "user_2026",
+  "use": "sig",
+  "alg": "ES256"
+ }
+}
