@@ -7,11 +7,11 @@ latest `checkout_jwt`."
 For both T1 (destination change) and T2 (fulfillment-option change),
 three cases:
 
-  (i)   Live state changes; NO replacement signed artifact is issued.
-        The latest checkout_jwt is still the authorized one, so the
-        latest-JWT check passes vacuously. Cryptographic validity and
-        AP2-latest compliance coincide — and completion against the
-        changed state is still not prohibited by any rule.
+  (i)   A modeled live state change with NO replacement signed artifact.
+        The latest checkout_jwt remains the authorized one, so the
+        latest-JWT check passes vacuously. This is a verifier-robustness
+        control ONLY: no protocol-permitted UCP transition producing
+        that unsigned state divergence has been demonstrated.
   (ii)  Live state changes; the merchant issues a replacement signed
         artifact (in UCP, every checkout response is signed —
         ap2-mandates.md L112-113); the buyer presents the OLD mandate.
@@ -80,8 +80,9 @@ def test_case_i_change_without_replacement_jwt(mutation_name):
         # authorized artifact. It does not compare live state at all.
         assert r.latest_jwt_match is True
         if cmp_ == "A":
-            # UCP's literal comparison also passes: completion against the
-            # changed state is prohibited by NO rule in this branch.
+            # UCP's narrow comparator accepts this modeled state.
+            # The transition producing it is NOT established as
+            # protocol-permitted, so this is not a conformance verdict.
             assert r.state_equivalent is True
             assert r.decision_ucp_only == "accept"
             assert r.decision_with_latest == "accept"
